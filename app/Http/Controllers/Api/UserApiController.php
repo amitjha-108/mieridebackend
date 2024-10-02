@@ -101,7 +101,7 @@ class UserApiController extends Controller
 
         // Check OTP in TempOtp model before creating the user
         if ($request->filled('otp')) {
-            $tempOtp = TempOtp::where('country_code', $request->country_code)->where('contact', $request->contact)->where('otp', $request->otp)->where('type', 'driver')->first();
+            $tempOtp = TempOtp::where('country_code', $request->country_code)->where('contact', $request->contact)->where('otp', $request->otp)->where('type', 'user')->first();
 
             if ($tempOtp) {
                 $user = new User();
@@ -143,6 +143,7 @@ class UserApiController extends Controller
             'gender' => 'required|in:Male,Female,Other',
             'email' => 'required|email|unique:users,email,' . auth()->guard('api')->user()->id,
             'password' => 'required|string|min:6|max:6',
+            'image'      => 'nullable|image|mimes:jpeg,png,jpg|max:5120', // 5MB max size
         ]);
         if ($validator->fails()) {
             return response()->json(['errors' => $validator->errors()], 422);

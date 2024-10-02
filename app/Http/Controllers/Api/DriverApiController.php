@@ -117,7 +117,11 @@ class DriverApiController extends Controller
         ]);
 
         if ($validator->fails()) {
-            return response()->json(['errors' => $validator->errors()], 422);
+            return response()->json([
+                'status' => 'failure',
+                'statusCode' => '400',
+                'data' => $validator->errors(),
+            ], 422);
         }
 
         $tempOtp = TempOtp::where('country_code', $request->country_code)
@@ -169,7 +173,8 @@ class DriverApiController extends Controller
         return response()->json([
             'message' => 'Driver registered successfully in step 1',
             'status' => 'success',
-            'statusCode' => '201',
+            'statusCode' => '200',
+            'is_login'   => false,
             'driver' => $driver,
         ], 201);
     }
