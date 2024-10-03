@@ -80,7 +80,7 @@ class DriverApiController extends Controller
                     return response()->json([
                         'message' => 'Invalid password',
                         'status' => 'failure',
-                        'statusCode' => '200',
+                        'statusCode' => '400',
                     ], 200);
                 }
             }
@@ -215,6 +215,7 @@ class DriverApiController extends Controller
             'statusCode' => '200',
             'is_login'   => false,
             'driver' => $driver,
+            'token' => $driver->createToken('auth_token')->accessToken,
         ], 201);
     }
 
@@ -313,6 +314,7 @@ class DriverApiController extends Controller
             'statusCode' => '200',
             'is_login'  => true,
             'driver' => $driver,
+            'token' => $driver->createToken('auth_token')->accessToken,
         ], 200);
     }
 
@@ -420,6 +422,7 @@ class DriverApiController extends Controller
             'statusCode' => '200',
             'is_login'  => true,
             'driver' => $driver,
+            'token' => $driver->createToken('auth_token')->accessToken,
         ], 200);
     }
 

@@ -78,7 +78,7 @@ class UserApiController extends Controller
                     return response()->json([
                         'message' => 'Invalid password',
                         'status' => 'failure',
-                        'statusCode' => '200',
+                        'statusCode' => '400',
                     ], 200);
                 }
             }
@@ -110,7 +110,7 @@ class UserApiController extends Controller
                     return response()->json([
                         'message' => $otpValidation['message'],
                         'status' => 'failure',
-                        'statusCode' => '200',
+                        'statusCode' => '400',
                     ], 200);
                 }
             }
@@ -153,7 +153,7 @@ class UserApiController extends Controller
                     return response()->json([
                         'message' => $otpValidation['message'],
                         'status' => 'failure',
-                        'statusCode' => '200',
+                        'statusCode' => '400',
                     ], 200);
                 }
             }
@@ -161,7 +161,7 @@ class UserApiController extends Controller
             return response()->json([
                 'message' => 'Invalid OTP',
                 'status' => 'failure',
-                'statusCode' => '200',
+                'statusCode' => '400',
             ], 200);
         }
 
