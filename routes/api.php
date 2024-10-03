@@ -9,7 +9,8 @@ use App\Http\Controllers\Api\DriverApiController;
 
 // Public route for sending OTP
 Route::post('/get-user-otp', [OtpApiController::class, 'sendUserOTP']);
-Route::post('/get-driver-otp', [OtpApiController::class, 'sendDriverOTP']);
+Route::post('/get-driver-login-otp', [OtpApiController::class, 'sendDriverLoginOTP']);
+Route::post('/get-driver-register-otp', [OtpApiController::class, 'sendDriverRegisterOTP']);
 Route::post('user-login', [UserApiController::class, 'loginWithOtporPassword']);
 Route::post('driver-login', [DriverApiController::class, 'driverLogin']);
 Route::post('register-driver', [DriverApiController::class, 'registerDriver']);

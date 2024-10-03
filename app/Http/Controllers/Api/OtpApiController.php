@@ -21,7 +21,11 @@ class OtpApiController extends Controller
 
         // Check if validation fails
         if ($validator->fails()) {
-            return response()->json(['errors' => $validator->errors(),], 422);
+            return response()->json([
+                'data' => $validator->errors(),
+                'status' => 'failure',
+                'statusCode' => '400',
+            ], 400);
         }
 
         $otp = rand(100000, 999999);
@@ -58,14 +62,23 @@ class OtpApiController extends Controller
                 ]
             );
 
-            return response()->json(['msg' => 'OTP sent successfully.'], 200);
+            return response()->json([
+                'message' => 'OTP sent successfully',
+                'status' => 'success',
+                'statusCode' => '200',
+            ], 200);
 
         } catch (\Exception $e) {
-            return response()->json(['msg' => 'Message Failed', 'error' => $e->getMessage()], 500);
+            return response()->json([
+                'message' => 'Server Error',
+                'status' => 'failure',
+                'statusCode' => '500',
+                'data' => $e->getMessage(),
+            ], 500);
         }
     }
 
-    public function sendDriverOTP(Request $request)
+    public function sendDriverLoginOTP(Request $request)
     {
         $validator = Validator::make($request->all(), [
             'country_code' => 'required',
@@ -74,7 +87,11 @@ class OtpApiController extends Controller
 
         // Check if validation fails
         if ($validator->fails()) {
-            return response()->json(['errors' => $validator->errors(),], 422);
+            return response()->json([
+                'data' => $validator->errors(),
+                'status' => 'failure',
+                'statusCode' => '400',
+            ], 400);
         }
 
         $otp = rand(100000, 999999);
@@ -88,12 +105,11 @@ class OtpApiController extends Controller
                 $driver->save();
             }
             else {
-                TempOtp::create([
-                    'country_code' => $request->country_code,
-                    'contact' => $request->contact,
-                    'otp' => $otp,
-                    'type' => 'driver',
-                ]);
+                return response()->json([
+                    'message' => 'Phone Number Not Registered',
+                    'status' => 'success',
+                    'statusCode' => '200',
+                ], 200);
             }
 
             // Send OTP via Twilio
@@ -111,10 +127,89 @@ class OtpApiController extends Controller
                 ]
             );
 
-            return response()->json(['msg' => 'OTP sent successfully.'], 200);
+            return response()->json([
+                'message' => 'OTP sent successfully',
+                'status' => 'success',
+                'statusCode' => '200',
+            ], 200);
 
         } catch (\Exception $e) {
-            return response()->json(['msg' => 'Message Failed', 'error' => $e->getMessage()], 500);
+            return response()->json([
+                'message' => 'Server Error',
+                'status' => 'failure',
+                'statusCode' => '500',
+                'data' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    public function sendDriverRegisterOTP(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'country_code' => 'required',
+            'contact' => 'required',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'data' => $validator->errors(),
+                'status' => 'failure',
+                'statusCode' => '400',
+            ], 400);
+        }
+
+        $otp = rand(100000, 999999);
+        $phone = '+' . $request->country_code . $request->contact;
+
+        try {
+            $driver = Driver::where('country_code', $request->country_code)
+                            ->where('contact', $request->contact)
+                            ->first();
+
+            if ($driver) {
+                return response()->json([
+                    'message' => 'Phone Number Already Registered',
+                    'status' => 'failure',
+                    'statusCode' => '200',
+                ], 200);
+            }
+            else {
+                TempOtp::create([
+                    'country_code' => $request->country_code,
+                    'contact' => $request->contact,
+                    'otp' => $otp,
+                    'type' => 'driver',
+                ]);
+
+                // Send OTP via Twilio
+                $twilioSid = env('TWILIO_SID');
+                $twilioAuthToken = env('TWILIO_AUTH_TOKEN');
+                $twilioPhoneNumber = env('TWILIO_PHONE_NUMBER');
+
+                $twilio = new Client($twilioSid, $twilioAuthToken);
+
+                $twilio->messages->create(
+                    $phone,
+                    [
+                        'from' => $twilioPhoneNumber,
+                        'body' => "Your OTP is: " . $otp
+                    ]
+                );
+
+                return response()->json([
+                    'message' => 'OTP sent successfully',
+                    'status' => 'success',
+                    'statusCode' => '200',
+                ], 200);
+            }
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Server Error',
+                'status' => 'failure',
+                'statusCode' => '500',
+                'data' => $e->getMessage(),
+            ], 500);
         }
     }
 

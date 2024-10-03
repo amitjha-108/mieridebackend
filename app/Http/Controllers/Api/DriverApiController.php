@@ -23,7 +23,11 @@ class DriverApiController extends Controller
         ]);
 
         if ($validator->fails()) {
-            return response()->json(['errors' => $validator->errors()], 422);
+            return response()->json([
+                'data' => $validator->errors(),
+                'status' => 'failure',
+                'statusCode' => '400',
+            ], 400);
         }
 
         $driver = Driver::where('country_code', $request->country_code)->where('contact', $request->contact)->first();
@@ -121,7 +125,7 @@ class DriverApiController extends Controller
                 'status' => 'failure',
                 'statusCode' => '400',
                 'data' => $validator->errors(),
-            ], 422);
+            ], 400);
         }
 
         $tempOtp = TempOtp::where('country_code', $request->country_code)
@@ -207,7 +211,11 @@ class DriverApiController extends Controller
 
         // Return validation errors if any
         if ($validator->fails()) {
-            return response()->json(['errors' => $validator->errors()], 422);
+            return response()->json([
+                'data' => $validator->errors(),
+                'status' => 'failure',
+                'statusCode' => '400',
+            ], 400);
         }
 
         // Prepare paths for storing images
@@ -302,7 +310,11 @@ class DriverApiController extends Controller
         ]);
 
         if ($validator->fails()) {
-            return response()->json(['errors' => $validator->errors()], 422);
+            return response()->json([
+                'data' => $validator->errors(),
+                'status' => 'failure',
+                'statusCode' => '400',
+            ], 400);
         }
 
         $data = $request->only([

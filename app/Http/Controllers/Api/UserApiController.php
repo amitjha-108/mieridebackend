@@ -165,7 +165,7 @@ class UserApiController extends Controller
                 'message' => 'Profile updated successfully',
                 'status' => 'success',
                 'statusCode' => '200',
-                'data' => $user,
+                'data' => $userData,
             ], 200);
         }
         else{
