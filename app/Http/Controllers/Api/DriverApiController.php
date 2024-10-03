@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Auth;
 use Storage;
+use Carbon\Carbon;
 
 class DriverApiController extends Controller
 {
@@ -24,15 +25,37 @@ class DriverApiController extends Controller
 
         if ($validator->fails()) {
             return response()->json([
-                'data' => $validator->errors(),
+                'message' => 'Validation Fail',
                 'status' => 'failure',
                 'statusCode' => '400',
+                'data' => $validator->errors(),
             ], 400);
         }
 
-        $driver = Driver::where('country_code', $request->country_code)->where('contact', $request->contact)->first();
+        $driver = Driver::where('country_code', $request->country_code)
+                        ->where('contact', $request->contact)
+                        ->first();
 
+        // OTP expiry and matching logic
+        $checkOtpExpiryAndMatch = function($otp, $otpModel) {
+            $otpCreatedTime = Carbon::parse($otpModel->updated_at);
+
+            // Check if OTP is expired (older than 2 minutes)
+            if ($otpCreatedTime->diffInMinutes(Carbon::now()) > 2) {
+                return ['status' => false, 'message' => 'OTP has expired'];
+            }
+
+            // Check if OTP matches
+            if ($otp != $otpModel->otp) {
+                return ['status' => false, 'message' => 'Invalid OTP'];
+            }
+
+            return ['status' => true];
+        };
+
+        // Existing driver login flow
         if ($driver) {
+            // Check login with password
             if ($request->filled('password')) {
                 if ($request->password == $driver->password) {
                     if ($driver->is_login) {
@@ -40,11 +63,11 @@ class DriverApiController extends Controller
                             'message' => 'Driver logged in successfully',
                             'status' => 'success',
                             'statusCode' => '200',
+                            'is_login' => true,
                             'token' => $driver->createToken('auth_token')->accessToken,
                             'data' => $driver,
                         ], 200);
-                    }
-                    else {
+                    } else {
                         return response()->json([
                             'message' => 'Driver profile is incomplete',
                             'status' => 'success',
@@ -53,8 +76,7 @@ class DriverApiController extends Controller
                             'token' => $driver->createToken('auth_token')->accessToken,
                         ], 200);
                     }
-                }
-                else {
+                } else {
                     return response()->json([
                         'message' => 'Invalid password',
                         'status' => 'failure',
@@ -63,18 +85,21 @@ class DriverApiController extends Controller
                 }
             }
 
+            // Handle login via OTP
             if ($request->filled('otp')) {
-                if ($request->otp == $driver->otp) {
+                $otpValidation = $checkOtpExpiryAndMatch($request->otp, $driver);
+
+                if ($otpValidation['status']) {
                     if ($driver->is_login) {
                         return response()->json([
                             'message' => 'Driver logged in successfully',
                             'status' => 'success',
                             'statusCode' => '200',
+                            'is_login' => true,
                             'token' => $driver->createToken('auth_token')->accessToken,
                             'data' => $driver,
                         ], 200);
-                    }
-                    else {
+                    } else {
                         return response()->json([
                             'message' => 'Driver profile is incomplete',
                             'status' => 'success',
@@ -83,13 +108,12 @@ class DriverApiController extends Controller
                             'token' => $driver->createToken('auth_token')->accessToken,
                         ], 200);
                     }
-                }
-                else {
+                } else {
                     return response()->json([
-                        'message' => 'Invalid OTP',
+                        'message' => $otpValidation['message'],
                         'status' => 'failure',
-                        'statusCode' => '403',
-                    ], 403);
+                        'statusCode' => '400',
+                    ], 400);
                 }
             }
 
@@ -103,8 +127,8 @@ class DriverApiController extends Controller
         return response()->json([
             'message' => 'Driver not found',
             'status' => 'failure',
-            'statusCode' => '404',
-        ], 404);
+            'statusCode' => '400',
+        ], 400);
     }
 
     public function registerDriver(Request $request)
@@ -122,6 +146,7 @@ class DriverApiController extends Controller
 
         if ($validator->fails()) {
             return response()->json([
+                'message' => 'Validation Fail',
                 'status' => 'failure',
                 'statusCode' => '400',
                 'data' => $validator->errors(),
@@ -137,6 +162,16 @@ class DriverApiController extends Controller
         if (!$tempOtp) {
             return response()->json([
                 'message' => 'Invalid OTP',
+                'status' => 'success',
+                'statusCode' => '200',
+            ], 200);
+        }
+
+        // Check if OTP has expired (older than 2 minutes)
+        $otpCreatedTime = Carbon::parse($tempOtp->created_at);
+        if ($otpCreatedTime->diffInMinutes(Carbon::now()) > 2) {
+            return response()->json([
+                'message' => 'OTP has expired',
                 'status' => 'success',
                 'statusCode' => '200',
             ], 200);
@@ -175,7 +210,7 @@ class DriverApiController extends Controller
         }
 
         return response()->json([
-            'message' => 'Driver registered successfully in step 1',
+            'message' => 'Driver registered successfully in step one',
             'status' => 'success',
             'statusCode' => '200',
             'is_login'   => false,
@@ -212,9 +247,10 @@ class DriverApiController extends Controller
         // Return validation errors if any
         if ($validator->fails()) {
             return response()->json([
-                'data' => $validator->errors(),
+                'message' => 'Validation Fail',
                 'status' => 'failure',
                 'statusCode' => '400',
+                'data' => $validator->errors(),
             ], 400);
         }
 
@@ -275,6 +311,7 @@ class DriverApiController extends Controller
             'message' => 'Driver profile completed successfully',
             'status' => 'success',
             'statusCode' => '200',
+            'is_login'  => true,
             'driver' => $driver,
         ], 200);
     }
@@ -311,9 +348,10 @@ class DriverApiController extends Controller
 
         if ($validator->fails()) {
             return response()->json([
-                'data' => $validator->errors(),
+                'message' => 'Validation Fail',
                 'status' => 'failure',
                 'statusCode' => '400',
+                'data' => $validator->errors(),
             ], 400);
         }
 
@@ -380,6 +418,7 @@ class DriverApiController extends Controller
             'message' => 'Driver profile updated successfully',
             'status' => 'success',
             'statusCode' => '200',
+            'is_login'  => true,
             'driver' => $driver,
         ], 200);
     }

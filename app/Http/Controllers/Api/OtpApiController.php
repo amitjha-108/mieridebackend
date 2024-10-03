@@ -22,9 +22,10 @@ class OtpApiController extends Controller
         // Check if validation fails
         if ($validator->fails()) {
             return response()->json([
-                'data' => $validator->errors(),
+                'message' => 'Validation Fail',
                 'status' => 'failure',
                 'statusCode' => '400',
+                'data' => $validator->errors(),
             ], 400);
         }
 
@@ -88,9 +89,10 @@ class OtpApiController extends Controller
         // Check if validation fails
         if ($validator->fails()) {
             return response()->json([
-                'data' => $validator->errors(),
+                'message' => 'Validation Fail',
                 'status' => 'failure',
                 'statusCode' => '400',
+                'data' => $validator->errors(),
             ], 400);
         }
 
@@ -152,9 +154,10 @@ class OtpApiController extends Controller
 
         if ($validator->fails()) {
             return response()->json([
-                'data' => $validator->errors(),
+                'message' => 'Validation Fail',
                 'status' => 'failure',
                 'statusCode' => '400',
+                'data' => $validator->errors(),
             ], 400);
         }
 

@@ -29,5 +29,6 @@ Route::middleware(['auth:driver'])->group(function () {
 
 Route::delete('/delete-driver/{id}', [DriverApiController::class, 'deleteDriver']);
 Route::get('/list-drivers', [DriverApiController::class, 'listDrivers']);
+Route::get('/list-users', [UserApiController::class, 'listUsers']);
 
 ?>
