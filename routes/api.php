@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\OtpApiController;
 use App\Http\Controllers\Api\UserApiController;
 use App\Http\Controllers\Api\DriverApiController;
+use App\Http\Controllers\Api\AdminApiController;
 
 
 // Public route for sending OTP
@@ -14,6 +15,9 @@ Route::post('/get-driver-register-otp', [OtpApiController::class, 'sendDriverReg
 Route::post('user-login', [UserApiController::class, 'loginWithOtporPassword']);
 Route::post('driver-login', [DriverApiController::class, 'driverLogin']);
 Route::post('register-driver', [DriverApiController::class, 'registerDriver']);
+
+Route::post('register-administrator', [AdminApiController::class, 'registerAdministrator']);
+Route::post('login-administrator', [AdminApiController::class, 'loginAdministrator']);
 
 
 
