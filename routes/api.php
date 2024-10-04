@@ -31,8 +31,10 @@ Route::middleware(['auth:driver'])->group(function () {
     Route::post('edit-driver-profile', [DriverApiController::class, 'editDriver']);
 });
 
-Route::delete('/delete-driver/{id}', [DriverApiController::class, 'deleteDriver']);
-Route::get('/list-drivers', [DriverApiController::class, 'listDrivers']);
-Route::get('/list-users', [UserApiController::class, 'listUsers']);
+Route::middleware(['auth:admin'])->group(function () {
+    Route::get('/list-users', [UserApiController::class, 'listUsers']);
+    Route::get('/list-drivers', [DriverApiController::class, 'listDrivers']);
+    Route::delete('/delete-driver/{id}', [DriverApiController::class, 'deleteDriver']);
+});
 
 ?>
