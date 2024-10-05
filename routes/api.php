@@ -6,6 +6,7 @@ use App\Http\Controllers\Api\OtpApiController;
 use App\Http\Controllers\Api\UserApiController;
 use App\Http\Controllers\Api\DriverApiController;
 use App\Http\Controllers\Api\AdminApiController;
+use App\Http\Controllers\Api\QueryApiController;
 
 
 // Public route for sending OTP
@@ -19,6 +20,8 @@ Route::post('register-driver', [DriverApiController::class, 'registerDriver']);
 Route::post('register-administrator', [AdminApiController::class, 'registerAdministrator']);
 Route::post('login-administrator', [AdminApiController::class, 'loginAdministrator']);
 
+Route::post('store-query', [QueryApiController::class, 'storeQueries']);
+
 
 
 Route::middleware(['auth:api'])->group(function () {
@@ -29,12 +32,14 @@ Route::middleware(['auth:api'])->group(function () {
 Route::middleware(['auth:driver'])->group(function () {
     Route::post('complete-driver-profile', [DriverApiController::class, 'completeDriverProfile']);
     Route::post('edit-driver-profile', [DriverApiController::class, 'editDriver']);
+    Route::get('get-approval-status', [DriverApiController::class, 'getApprovalStatus']);
 });
 
 Route::middleware(['auth:admin'])->group(function () {
     Route::get('/list-users', [UserApiController::class, 'listUsers']);
     Route::get('/list-drivers', [DriverApiController::class, 'listDrivers']);
     Route::delete('/delete-driver/{id}', [DriverApiController::class, 'deleteDriver']);
+    Route::get('list-queries', [QueryApiController::class, 'listQueries']);
 });
 
 ?>

@@ -313,7 +313,7 @@ class DriverApiController extends Controller
             'status' => 'success',
             'statusCode' => '200',
             'is_login'  => true,
-            'driver' => $driver,
+            'data' => $driver,
             'token' => $driver->createToken('auth_token')->accessToken,
         ], 200);
     }
@@ -421,7 +421,7 @@ class DriverApiController extends Controller
             'status' => 'success',
             'statusCode' => '200',
             'is_login'  => true,
-            'driver' => $driver,
+            'data' => $driver,
             'token' => $driver->createToken('auth_token')->accessToken,
         ], 200);
     }
@@ -454,8 +454,21 @@ class DriverApiController extends Controller
             'message' => 'Drivers retrieved successfully',
             'status' => 'success',
             'statusCode' => '200',
-            'drivers' => $drivers,
+            'data' => $drivers,
         ], 200);
     }
 
+    public function getApprovalStatus()
+    {
+        $driver = auth('driver')->user();
+        $data=[];
+        $data['approvalStatus'] = $driver->status;
+
+        return response()->json([
+            'message' => 'Driver approval status retrieved successfully',
+            'status' => 'success',
+            'statusCode' => '200',
+            'data' => $data ,
+        ], 200);
+    }
 }
