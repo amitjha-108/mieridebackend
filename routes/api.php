@@ -46,6 +46,7 @@ Route::middleware(['auth:admin'])->group(function () {
     Route::post('store-role', [RoleApiController::class, 'storeRoles']);
     Route::get('list-roles', [RoleApiController::class, 'listRoles']);
     Route::post('assign-permission-to-role', [PermissionApiController::class, 'assignPermissionToRole']);
+    Route::post('update-permission-to-role', [PermissionApiController::class, 'updatePermissionForRole']);
 });
 
 ?>

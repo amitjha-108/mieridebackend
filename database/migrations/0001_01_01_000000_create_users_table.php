@@ -30,7 +30,7 @@ return new class extends Migration
             $table->string('lat', 255)->nullable();
             $table->string('long', 255)->nullable();
             $table->string('date', 100)->nullable();
-            $table->string('user_wallet', 100)->nullable();
+            $table->integer('user_wallet')->nullable()->default(0);
             $table->integer('total_coins')->nullable();
             $table->string('social_id', 500)->nullable();
             $table->string('social_type', 50)->nullable();

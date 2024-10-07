@@ -21,7 +21,7 @@ return new class extends Migration
             $table->string('contact_no', 15)->nullable();
             $table->string('password', 200)->nullable();
             $table->string('image', 215)->nullable();
-            $table->string('wallet_money', 255)->nullable();
+            $table->integer('wallet_money')->nullable()->default(0);
             $table->string('user_type', 255)->nullable();
             $table->enum('status', ['active', 'inactive'])->default('active');
             $table->string('device_status', 215)->nullable();
