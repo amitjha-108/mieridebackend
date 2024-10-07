@@ -7,6 +7,8 @@ use App\Http\Controllers\Api\UserApiController;
 use App\Http\Controllers\Api\DriverApiController;
 use App\Http\Controllers\Api\AdminApiController;
 use App\Http\Controllers\Api\QueryApiController;
+use App\Http\Controllers\Api\RoleApiController;
+use App\Http\Controllers\Api\PermissionApiController;
 
 
 // Public route for sending OTP
@@ -40,6 +42,10 @@ Route::middleware(['auth:admin'])->group(function () {
     Route::get('/list-drivers', [DriverApiController::class, 'listDrivers']);
     Route::delete('/delete-driver/{id}', [DriverApiController::class, 'deleteDriver']);
     Route::get('list-queries', [QueryApiController::class, 'listQueries']);
+
+    Route::post('store-role', [RoleApiController::class, 'storeRoles']);
+    Route::get('list-roles', [RoleApiController::class, 'listRoles']);
+    Route::post('assign-permission-to-role', [PermissionApiController::class, 'assignPermissionToRole']);
 });
 
 ?>

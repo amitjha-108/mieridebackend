@@ -53,7 +53,7 @@ class QueryApiController extends Controller
             'status' => 'success',
             'statusCode' => '200',
             'data' => $queries,
-            ], 201);
-}
+            ], 200);
+    }
 
 }
