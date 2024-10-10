@@ -8,11 +8,14 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Passport\HasApiTokens;
 
-class Admin extends Authenticatable
+class SubroleUser extends Authenticatable
 {
     use HasApiTokens, Notifiable, HasFactory;
 
     protected $fillable = [
+        'parent_id',
+        'role_id',
+        'subrole_id',
         'first_name',
         'last_name',
         'username',
@@ -22,7 +25,6 @@ class Admin extends Authenticatable
         'password',
         'image',
         'wallet_money',
-        'role_id',
         'status',
         'device_status',
         'device_id',

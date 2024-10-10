@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Validator;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
+use App\Models\Subrole;
 
 class RoleApiController extends Controller
 {
@@ -51,5 +52,51 @@ class RoleApiController extends Controller
             'statusCode' => '200',
             'data' => $roles,
             ], 200);
+    }
+
+    //create subrole for a created role
+    public function storeSubroles(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'role_id' => 'required|integer|exists:roles,id',
+            'subrole_name' => 'required|string|max:255|unique:subroles,subrole_name',
+        ]);
+        // Check if validation fails
+        if ($validator->fails()) {
+            return response()->json([
+                'message' => 'Validation Fail',
+                'status' => 'failure',
+                'statusCode' => '400',
+                'data' => $validator->errors(),
+            ], 400);
+        }
+
+        $role = Subrole::create([
+            'role_id' => $request->role_id,
+            'subrole_name' => $request->subrole_name,
+        ]);
+
+        return response()->json([
+            'message' => 'Subrole created successfully',
+            'status' => 'success',
+            'statusCode' => '200',
+            'data' => $role,
+            ], 201);
+    }
+
+    public function listSubroles(Request $request){
+        if ($request->has('role_id')) {
+            $roles = Subrole::where('role_id', $request->role_id)->get();
+        }
+        else {
+            $roles = Subrole::all();
+        }
+
+        return response()->json([
+            'message' => 'Subrole list retrieved successfully',
+            'status' => 'success',
+            'statusCode' => '200',
+            'data' => $roles,
+        ], 200);
     }
 }

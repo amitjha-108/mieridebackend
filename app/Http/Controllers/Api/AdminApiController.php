@@ -55,7 +55,7 @@ class AdminApiController extends Controller
             'contact_no' => $request->contact_no,
             'password' => $request->password,
             'image' => $request->image,
-            'user_type' => 'administrator',
+            'role_id' => '1',
             'wallet_money' => 0,
             'status' => 'active',
             'device_status' => 'active',
@@ -104,7 +104,7 @@ class AdminApiController extends Controller
             ], 200);
         }
 
-        $role = Role::where('role_name', $administrator->user_type)->first();
+        $role = Role::where('id', $administrator->role_id)->first();
         $permissions = [];
         if ($role) {
             $permissions = Permission::where('role_id', $role->id)->get();
@@ -116,7 +116,7 @@ class AdminApiController extends Controller
             'message' => 'Administrator Login successfully',
             'status' => 'success',
             'statusCode' => '200',
-            'userType' => $administrator->user_type,
+            'userType' => $administrator->role_id,
             'token' => $token,
             'data' => $administrator,
             'permissions' => $permissions,

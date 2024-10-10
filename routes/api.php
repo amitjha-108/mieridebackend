@@ -9,6 +9,7 @@ use App\Http\Controllers\Api\AdminApiController;
 use App\Http\Controllers\Api\QueryApiController;
 use App\Http\Controllers\Api\RoleApiController;
 use App\Http\Controllers\Api\PermissionApiController;
+use App\Http\Controllers\Api\SubroleUserApiController;
 
 
 // Public route for sending OTP
@@ -45,8 +46,14 @@ Route::middleware(['auth:admin'])->group(function () {
 
     Route::post('store-role', [RoleApiController::class, 'storeRoles']);
     Route::get('list-roles', [RoleApiController::class, 'listRoles']);
+
     Route::post('assign-permission-to-role', [PermissionApiController::class, 'assignPermissionToRole']);
     Route::post('update-permission-to-role', [PermissionApiController::class, 'updatePermissionForRole']);
+
+    Route::post('store-subrole', [RoleApiController::class, 'storeSubroles']);
+    Route::get('list-subroles', [RoleApiController::class, 'listSubroles']);
+
+    Route::post('create-subrole-user', [SubroleUserApiController::class, 'storeSubroleUser']);
 });
 
 ?>
