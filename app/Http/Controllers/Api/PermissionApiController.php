@@ -234,8 +234,8 @@ class PermissionApiController extends Controller
             'pp_user' => $request->pp_user ?? 0,
             'pp_driver' => $request->pp_driver ?? 0,
             'support' => $request->support ?? 0,
-            'date' => now(),
-            'time' => now(),
+            'date' => $request->date ?? 0,
+            'time' => $request->time ?? 0,
             'is_read' => 0,
         ]);
 
@@ -350,8 +350,8 @@ class PermissionApiController extends Controller
             'pp_user' => 'nullable|integer',
             'pp_driver' => 'nullable|integer',
             'support' => 'nullable|integer',
-            'date' => 'nullable|date',
-            'time' => 'nullable|date_format:H:i:s',
+            'date' => 'nullable|integer',
+            'time' => 'nullable|integer',
             'is_read' => 'nullable|integer',
         ]);
 

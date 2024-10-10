@@ -8,6 +8,8 @@ use Twilio\Rest\Client;
 use App\Models\Admin;
 use App\Models\Role;
 use App\Models\Permission;
+use App\Models\SubroleUser;
+use App\Models\SubrolePermission;
 use App\Models\User;
 use Illuminate\Support\Facades\Validator;
 use Carbon\Carbon;
@@ -59,6 +61,7 @@ class AdminApiController extends Controller
             'wallet_money' => 0,
             'status' => 'active',
             'device_status' => 'active',
+            'create_child' => 1,
             ]);
 
         return response()->json([
@@ -117,8 +120,60 @@ class AdminApiController extends Controller
             'status' => 'success',
             'statusCode' => '200',
             'userType' => $administrator->role_id,
+            'createChild' => $administrator->create_child,
             'token' => $token,
             'data' => $administrator,
+            'permissions' => $permissions,
+        ], 200);
+    }
+
+    public function loginSubroleUser(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'email' => 'required|string|email|max:150',
+            'password' => 'required|string|min:6',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'message' => 'Validation failed',
+                'status' => 'failure',
+                'statusCode' => '400',
+                'data' => $validator->errors(),
+            ], 400);
+        }
+
+        $subroleuser = SubroleUser::where('email', $request->email)->first();
+
+        if (!$subroleuser) {
+            return response()->json([
+                'message' => 'Email not registered',
+                'status' => 'failure',
+                'statusCode' => '400',
+            ], 400);
+        }
+
+        if ($request->password != $subroleuser->password) {
+            return response()->json([
+                'message' => 'Incorrect password',
+                'status' => 'failure',
+                'statusCode' => '400',
+            ], 200);
+        }
+
+        $permissions = [];
+        $permissions = SubrolePermission::where('subrole_user_id', $subroleuser->id)->get();
+
+        $token = $subroleuser->createToken('auth_token')->accessToken;
+
+        return response()->json([
+            'message' => 'Subrole User Login successfully',
+            'status' => 'success',
+            'statusCode' => '200',
+            'userType' => $subroleuser->role_id,
+            'createChild' => $subroleuser->create_child,
+            'token' => $token,
+            'data' => $subroleuser,
             'permissions' => $permissions,
         ], 200);
     }

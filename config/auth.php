@@ -53,6 +53,10 @@ return [
         'driver' => 'passport',
         'provider' => 'admins',
         ],
+        'subroleuser' => [
+        'driver' => 'passport',
+        'provider' => 'subrole_users',
+        ],
     ],
 
     /*
@@ -86,6 +90,11 @@ return [
         'admins' => [
         'driver' => 'eloquent',
         'model' => App\Models\Admin::class,
+        ],
+
+        'subrole_users' => [
+        'driver' => 'eloquent',
+        'model' => App\Models\SubroleUser::class,
         ],
 
 

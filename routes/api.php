@@ -10,6 +10,7 @@ use App\Http\Controllers\Api\QueryApiController;
 use App\Http\Controllers\Api\RoleApiController;
 use App\Http\Controllers\Api\PermissionApiController;
 use App\Http\Controllers\Api\SubroleUserApiController;
+use App\Http\Controllers\Api\SubrolePermissionApiController;
 
 
 // Public route for sending OTP
@@ -22,6 +23,8 @@ Route::post('register-driver', [DriverApiController::class, 'registerDriver']);
 
 Route::post('register-administrator', [AdminApiController::class, 'registerAdministrator']);
 Route::post('login-administrator', [AdminApiController::class, 'loginAdministrator']);
+
+Route::post('login-subrole-user', [AdminApiController::class, 'loginSubroleUser']);
 
 Route::post('store-query', [QueryApiController::class, 'storeQueries']);
 
@@ -54,6 +57,13 @@ Route::middleware(['auth:admin'])->group(function () {
     Route::get('list-subroles', [RoleApiController::class, 'listSubroles']);
 
     Route::post('create-subrole-user', [SubroleUserApiController::class, 'storeSubroleUser']);
+
+});
+
+Route::middleware(['auth:subroleuser'])->group(function () {
+    Route::post('create-subrole-user', [SubroleUserApiController::class, 'storeSubroleUser']);
+
+    Route::post('assign-permission-to-subrole-user', [SubrolePermissionApiController::class, 'assignPermissionToSubroleUser']);
 });
 
 ?>

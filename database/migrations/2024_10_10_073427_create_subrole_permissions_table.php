@@ -11,10 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('permissions', function (Blueprint $table) {
+        Schema::create('subrole_permissions', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('role_id');
-            $table->foreign('role_id')->references('id')->on('roles')->onDelete('cascade');
+            $table->unsignedBigInteger('subrole_user_id');
+            $table->foreign('subrole_user_id')->references('id')->on('subrole_users')->onDelete('cascade');
             $table->integer('dashboard')->nullable();
             $table->integer('admins')->nullable();
             $table->integer('subadmin')->nullable();
@@ -126,6 +126,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('permissions');
+        Schema::dropIfExists('subrole_permissions');
     }
 };
