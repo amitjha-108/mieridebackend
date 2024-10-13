@@ -20,7 +20,7 @@ class SubroleUserApiController extends Controller
     public function storeSubroleUser(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'subrole_id' => 'nullable|exists:subroles,id',
+            'role_id' => 'nullable|exists:roles,id',
             'first_name' => 'required|string|max:215',
             'last_name' => 'required|string|max:100',
             'username' => 'required|string|max:150|unique:subrole_users,username',
@@ -47,13 +47,35 @@ class SubroleUserApiController extends Controller
             ], 400);
         }
 
-        $loggedUser = auth('admin')->user();
+        // Determine if the logged-in user is an admin or a subrole user
+        $loggedUser = null;
+        $isAdmin = false;
+
+        if (auth('admin')->user()->token()->guard_name == 'admin') {
+            $loggedUser = auth('admin')->user();
+            $isAdmin = true;
+        }
+        elseif (auth('subroleuser')->user()->token()->guard_name == 'subroleuser') {
+            $loggedUser = auth('subroleuser')->user();
+        }
+
+        if (!$loggedUser) {
+            return response()->json([
+                'message' => 'Unauthorized',
+                'status' => 'failure',
+                'statusCode' => '401',
+            ], 401);
+        }
 
         // Create a new subrole user
         $subroleUser = new SubroleUser();
-        $subroleUser->parent_id = $loggedUser->id;
-        $subroleUser->role_id = $loggedUser->role_id;
-        $subroleUser->subrole_id = $request->subrole_id;
+        if ($isAdmin) {
+            $subroleUser->admin_id = $loggedUser->id;
+        }
+        else {
+            $subroleUser->parent_id = $loggedUser->id;
+        }
+        $subroleUser->role_id = $request->role_id;
         $subroleUser->first_name = $request->first_name;
         $subroleUser->last_name = $request->last_name;
         $subroleUser->username = $request->username;

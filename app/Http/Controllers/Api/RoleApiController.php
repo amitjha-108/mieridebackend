@@ -19,8 +19,9 @@ class RoleApiController extends Controller
     public function storeRoles(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'role_name' => 'required|string|max:255|unique:roles,role_name',
+            'name' => 'required|string|max:255|unique:roles,name',
         ]);
+
         // Check if validation fails
         if ($validator->fails()) {
             return response()->json([
@@ -31,8 +32,23 @@ class RoleApiController extends Controller
             ], 400);
         }
 
+        $createdByAdminId = null;
+        $createdBySubroleUserId = null;
+
+        if (auth('admin')->user()->token()->guard_name == 'admin') {
+            $createdByAdminId = auth('admin')->user()->id;
+            $createdByRoleId = auth('admin')->user()->role_id;
+        }
+        elseif(auth('subroleuser')->user()->token()->guard_name == 'subroleuser') {
+            $createdBySubroleUserId = auth('subroleuser')->user()->id;
+            $createdByRoleId = auth('subroleuser')->user()->role_id;
+        }
+
         $role = Role::create([
-            'role_name' => $request->role_name,
+            'name' => $request->name,
+            'created_by_role_id' => $createdByRoleId,
+            'created_by_admin_id' => $createdByAdminId,
+            'created_by_subroleuser_id' => $createdBySubroleUserId,
         ]);
 
         return response()->json([
@@ -40,63 +56,33 @@ class RoleApiController extends Controller
             'status' => 'success',
             'statusCode' => '200',
             'data' => $role,
-            ], 201);
+        ], 200);
     }
+
 
     public function listRoles()
     {
-        $roles = Role::with('permissions')->get();
+        $createdByAdminId = null;
+        $createdBySubroleUserId = null;
+
+        if (auth('admin')->user()->token()->guard_name == 'admin') {
+            $createdByAdminId = auth('admin')->user()->id;
+            // $roles = Role::select('id', 'name')->where('created_by_admin_id', $createdByAdminId)->with('permissions')->get();
+            $roles = Role::select('id', 'name')->with('permissions')->get();
+        }
+        elseif (auth('subroleuser')->user()->token()->guard_name == 'subroleuser') {
+            $createdBySubroleUserId = auth('subroleuser')->user()->id;
+            $createdByRoleId = auth('subroleuser')->user()->role_id;
+            $roles = Role::select('id', 'name')->where('created_by_subroleuser_id', $createdBySubroleUserId)->orWhere('created_by_role_id',$createdByRoleId)->with('permissions')->get();
+        }
+
+        // Return the list of roles
         return response()->json([
             'message' => 'Role list retrieved successfully',
             'status' => 'success',
             'statusCode' => '200',
             'data' => $roles,
-            ], 200);
-    }
-
-    //create subrole for a created role
-    public function storeSubroles(Request $request)
-    {
-        $validator = Validator::make($request->all(), [
-            'role_id' => 'required|integer|exists:roles,id',
-            'subrole_name' => 'required|string|max:255|unique:subroles,subrole_name',
-        ]);
-        // Check if validation fails
-        if ($validator->fails()) {
-            return response()->json([
-                'message' => 'Validation Fail',
-                'status' => 'failure',
-                'statusCode' => '400',
-                'data' => $validator->errors(),
-            ], 400);
-        }
-
-        $role = Subrole::create([
-            'role_id' => $request->role_id,
-            'subrole_name' => $request->subrole_name,
-        ]);
-
-        return response()->json([
-            'message' => 'Subrole created successfully',
-            'status' => 'success',
-            'statusCode' => '200',
-            'data' => $role,
-            ], 201);
-    }
-
-    public function listSubroles(Request $request){
-        if ($request->has('role_id')) {
-            $roles = Subrole::where('role_id', $request->role_id)->get();
-        }
-        else {
-            $roles = Subrole::all();
-        }
-
-        return response()->json([
-            'message' => 'Subrole list retrieved successfully',
-            'status' => 'success',
-            'statusCode' => '200',
-            'data' => $roles,
         ], 200);
     }
+
 }

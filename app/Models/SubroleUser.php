@@ -14,8 +14,8 @@ class SubroleUser extends Authenticatable
 
     protected $fillable = [
         'parent_id',
+        'admin_id',
         'role_id',
-        'subrole_id',
         'first_name',
         'last_name',
         'username',

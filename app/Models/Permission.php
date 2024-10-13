@@ -11,6 +11,7 @@ class Permission extends Model
     use HasFactory;
     protected $fillable = [
         'role_id',
+        'admin_id',
         'dashboard',
         'admins',
         'subadmin',
@@ -115,8 +116,4 @@ class Permission extends Model
         'is_read',
     ];
 
-    public function role()
-    {
-        return $this->belongsTo(Role::class, 'role_id', 'id');
-    }
 }

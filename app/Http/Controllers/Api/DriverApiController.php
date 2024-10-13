@@ -55,6 +55,10 @@ class DriverApiController extends Controller
 
         // Existing driver login flow
         if ($driver) {
+            $tokenResult = $driver->createToken('auth_token');
+            $tokenResult->token->guard_name = 'driver';
+            $tokenResult->token->save();
+
             // Check login with password
             if ($request->filled('password')) {
                 if ($request->password == $driver->password) {
@@ -64,7 +68,7 @@ class DriverApiController extends Controller
                             'status' => 'success',
                             'statusCode' => '200',
                             'is_login' => true,
-                            'token' => $driver->createToken('auth_token')->accessToken,
+                            'token' => $tokenResult->accessToken,
                             'data' => $driver,
                         ], 200);
                     } else {
@@ -73,7 +77,7 @@ class DriverApiController extends Controller
                             'status' => 'success',
                             'statusCode' => '200',
                             'is_login' => false,
-                            'token' => $driver->createToken('auth_token')->accessToken,
+                            'token' => $tokenResult->accessToken,
                         ], 200);
                     }
                 } else {
@@ -96,7 +100,7 @@ class DriverApiController extends Controller
                             'status' => 'success',
                             'statusCode' => '200',
                             'is_login' => true,
-                            'token' => $driver->createToken('auth_token')->accessToken,
+                            'token' => $tokenResult->accessToken,
                             'data' => $driver,
                         ], 200);
                     } else {
@@ -105,7 +109,7 @@ class DriverApiController extends Controller
                             'status' => 'success',
                             'statusCode' => '200',
                             'is_login' => false,
-                            'token' => $driver->createToken('auth_token')->accessToken,
+                            'token' => $tokenResult->accessToken,
                         ], 200);
                     }
                 } else {
@@ -209,13 +213,17 @@ class DriverApiController extends Controller
             $driver->update(['image' => $imagePath]);
         }
 
+        $tokenResult = $driver->createToken('auth_token');
+        $tokenResult->token->guard_name = 'driver';
+        $tokenResult->token->save();
+
         return response()->json([
             'message' => 'Driver registered successfully in step one',
             'status' => 'success',
             'statusCode' => '200',
             'is_login'   => false,
             'driver' => $driver,
-            'token' => $driver->createToken('auth_token')->accessToken,
+            'token' => $tokenResult->accessToken,
         ], 201);
     }
 
@@ -307,6 +315,10 @@ class DriverApiController extends Controller
             'is_login'        => true,
         ]);
 
+        $tokenResult = $driver->createToken('auth_token');
+        $tokenResult->token->guard_name = 'driver';
+        $tokenResult->token->save();
+
         // Return success response
         return response()->json([
             'message' => 'Driver profile completed successfully',
@@ -314,7 +326,7 @@ class DriverApiController extends Controller
             'statusCode' => '200',
             'is_login'  => true,
             'data' => $driver,
-            'token' => $driver->createToken('auth_token')->accessToken,
+            'token' => $tokenResult->accessToken,
         ], 200);
     }
 
@@ -416,13 +428,17 @@ class DriverApiController extends Controller
             $driver->update(['ownership_image' => $ownershipImagePath]);
         }
 
+        $tokenResult = $driver->createToken('auth_token');
+        $tokenResult->token->guard_name = 'driver';
+        $tokenResult->token->save();
+
         return response()->json([
             'message' => 'Driver profile updated successfully',
             'status' => 'success',
             'statusCode' => '200',
             'is_login'  => true,
             'data' => $driver,
-            'token' => $driver->createToken('auth_token')->accessToken,
+            'token' => $tokenResult->accessToken,
         ], 200);
     }
 

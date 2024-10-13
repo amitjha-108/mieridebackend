@@ -13,14 +13,14 @@ return new class extends Migration
     {
         Schema::create('subrole_users', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('parent_id')->nullable();
-            $table->foreign('parent_id')->references('id')->on('admins')->onDelete('cascade');
+            $table->unsignedBigInteger('parent_id')->nullable(); // For hierarchy (admin -> subadmin -> manager -> team)
+            $table->foreign('parent_id')->references('id')->on('subrole_users')->onDelete('cascade');
+
+            $table->unsignedBigInteger('admin_id')->nullable(); // Reference to the admin who created the subadmin
+            $table->foreign('admin_id')->references('id')->on('admins')->onDelete('cascade');
 
             $table->unsignedBigInteger('role_id')->nullable();
             $table->foreign('role_id')->references('id')->on('roles')->onDelete('cascade');
-
-            $table->unsignedBigInteger('subrole_id')->nullable();
-            $table->foreign('subrole_id')->references('id')->on('subroles')->onDelete('cascade');
 
             $table->string('first_name', 215)->nullable();
             $table->string('last_name', 100)->nullable();

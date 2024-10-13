@@ -119,8 +119,8 @@ class PermissionApiController extends Controller
             'pp_user' => 'nullable|integer',
             'pp_driver' => 'nullable|integer',
             'support' => 'nullable|integer',
-            'date' => 'nullable|date',
-            'time' => 'nullable|date_format:H:i:s',
+            'date' => 'nullable|integer',
+            'time' => 'nullable|integer',
             'is_read' => 'nullable|integer',
         ]);
 

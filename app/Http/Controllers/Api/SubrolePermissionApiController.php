@@ -123,8 +123,8 @@ class SubrolePermissionApiController extends Controller
             'pp_user' => 'nullable|integer',
             'pp_driver' => 'nullable|integer',
             'support' => 'nullable|integer',
-            'date' => 'nullable|date',
-            'time' => 'nullable|date_format:H:i:s',
+            'date' => 'nullable|integer',
+            'time' => 'nullable|integer',
             'is_read' => 'nullable|integer',
         ]);
 
@@ -137,114 +137,144 @@ class SubrolePermissionApiController extends Controller
             ], 400);
         }
 
-        $loggedUser = auth('subroleuser')->user();
+        // Determine if the logged-in user is an admin or subrole user
+        $loggedUser = null;
+        $isAdmin = false;
+
+        if (auth('admin')->user()->token()->guard_name == 'admin') {
+            $loggedUser = auth('admin')->user();
+            $isAdmin = true;
+        }
+        elseif (auth('subroleuser')->user()->token()->guard_name == 'subroleuser') {
+            $loggedUser = auth('subroleuser')->user();
+        }
+
+        // Check if the user is logged in
+        if (!$loggedUser) {
+            return response()->json([
+                'message' => 'Unauthorized',
+                'status' => 'failure',
+                'statusCode' => '401',
+            ], 401);
+        }
 
         if($loggedUser->create_child == 1){
-            $permission = SubrolePermission::create([
-                'subrole_user_id' => $request->subrole_user_id,
-                'dashboard' => $request->dashboard ?? 0,
-                'admins' => $request->admins ?? 0,
-                'subadmin' => $request->subadmin ?? 0,
-                'users' => $request->users ?? 0,
-                'drivers' => $request->drivers ?? 0,
-                'manager' => $request->manager ?? 0,
-                'accountant' => $request->accountant ?? 0,
-                'marketing' => $request->marketing ?? 0,
-                'b_dashboard' => $request->b_dashboard ?? 0,
-                'sharing_new_booking' => $request->sharing_new_booking ?? 0,
-                'sharing_confirm' => $request->sharing_confirm ?? 0,
-                'sharing_assign' => $request->sharing_assign ?? 0,
-                'sharing_accept' => $request->sharing_accept ?? 0,
-                'sharing_en_route' => $request->sharing_en_route ?? 0,
-                'sharing_complete' => $request->sharing_complete ?? 0,
-                'sharing_cancel' => $request->sharing_cancel ?? 0,
-                'private_new_booking' => $request->private_new_booking ?? 0,
-                'private_confirm' => $request->private_confirm ?? 0,
-                'private_assign' => $request->private_assign ?? 0,
-                'private_accept' => $request->private_accept ?? 0,
-                'private_en_route' => $request->private_en_route ?? 0,
-                'private_complete' => $request->private_complete ?? 0,
-                'private_cancel' => $request->private_cancel ?? 0,
-                'toairport_new_booking' => $request->toairport_new_booking ?? 0,
-                'toairport_confirm' => $request->toairport_confirm ?? 0,
-                'toairport_assign' => $request->toairport_assign ?? 0,
-                'toairport_accept' => $request->toairport_accept ?? 0,
-                'toairport_en_route' => $request->toairport_en_route ?? 0,
-                'toairport_complete' => $request->toairport_complete ?? 0,
-                'toairport_cancel' => $request->toairport_cancel ?? 0,
-                'fromairport_new_booking' => $request->fromairport_new_booking ?? 0,
-                'fromairport_confirm' => $request->fromairport_confirm ?? 0,
-                'fromairport_assign' => $request->fromairport_assign ?? 0,
-                'fromairport_accept' => $request->fromairport_accept ?? 0,
-                'fromairport_en_route' => $request->fromairport_en_route ?? 0,
-                'fromairport_complete' => $request->fromairport_complete ?? 0,
-                'fromairport_cancel' => $request->fromairport_cancel ?? 0,
-                'drivetest_new_booking' => $request->drivetest_new_booking ?? 0,
-                'drivetest_confirm' => $request->drivetest_confirm ?? 0,
-                'drivetest_assign' => $request->drivetest_assign ?? 0,
-                'drivetest_accept' => $request->drivetest_accept ?? 0,
-                'drivetest_en_route' => $request->drivetest_en_route ?? 0,
-                'drivetest_complete' => $request->drivetest_complete ?? 0,
-                'drivetest_cancel' => $request->drivetest_cancel ?? 0,
-                'intercity_new_booking' => $request->intercity_new_booking ?? 0,
-                'intercity_confirm' => $request->intercity_confirm ?? 0,
-                'intercity_assign' => $request->intercity_assign ?? 0,
-                'intercity_accept' => $request->intercity_accept ?? 0,
-                'intercity_en_route' => $request->intercity_en_route ?? 0,
-                'intercity_complete' => $request->intercity_complete ?? 0,
-                'intercity_cancel' => $request->intercity_cancel ?? 0,
-                'ab_new_booking' => $request->ab_new_booking ?? 0,
-                'ab_confirm' => $request->ab_confirm ?? 0,
-                'ab_cancel' => $request->ab_cancel ?? 0,
-                'route_new_booking' => $request->route_new_booking ?? 0,
-                'route_confirm' => $request->route_confirm ?? 0,
-                'route_cancel' => $request->route_cancel ?? 0,
-                'out_of_area' => $request->out_of_area ?? 0,
-                'cs_dashboard' => $request->cs_dashboard ?? 0,
-                'chat_support' => $request->chat_support ?? 0,
-                'fm_dashboard' => $request->fm_dashboard ?? 0,
-                'deposits' => $request->deposits ?? 0,
-                'd_withdraw' => $request->d_withdraw ?? 0,
-                'switch' => $request->switch ?? 0,
-                'ac_dashboard' => $request->ac_dashboard ?? 0,
-                'ads_user' => $request->ads_user ?? 0,
-                'ads_on_route' => $request->ads_on_route ?? 0,
-                'ads_end_receipt' => $request->ads_end_receipt ?? 0,
-                'ads_driver' => $request->ads_driver ?? 0,
-                'notify' => $request->notify ?? 0,
-                'deals_user' => $request->deals_user ?? 0,
-                'deals_driver' => $request->deals_driver ?? 0,
-                'website' => $request->website ?? 0,
-                'pc_dashboard' => $request->pc_dashboard ?? 0,
-                'categeries' => $request->categeries ?? 0,
-                'cities' => $request->cities ?? 0,
-                'add_sharing' => $request->add_sharing ?? 0,
-                'add_private' => $request->add_private ?? 0,
-                'add_to_airport' => $request->add_to_airport ?? 0,
-                'add_from_airport' => $request->add_from_airport ?? 0,
-                'add_drive' => $request->add_drive ?? 0,
-                'add_intercity' => $request->add_intercity ?? 0,
-                'rates' => $request->rates ?? 0,
-                'surge' => $request->surge ?? 0,
-                'commission' => $request->commission ?? 0,
-                'gt_charges' => $request->gt_charges ?? 0,
-                'interac_id' => $request->interac_id ?? 0,
-                'payout_info' => $request->payout_info ?? 0,
-                'pc_cancel' => $request->pc_cancel ?? 0,
-                'r_dashboard' => $request->r_dashboard ?? 0,
-                'report' => $request->report ?? 0,
-                's_dashboard' => $request->s_dashboard ?? 0,
-                'faq_user' => $request->faq_user ?? 0,
-                'faq_driver' => $request->faq_driver ?? 0,
-                'tc_user' => $request->tc_user ?? 0,
-                'tc_driver' => $request->tc_driver ?? 0,
-                'pp_user' => $request->pp_user ?? 0,
-                'pp_driver' => $request->pp_driver ?? 0,
-                'support' => $request->support ?? 0,
-                'date' => $request->support ?? 0,
-                'time' => $request->support ?? 0,
-                'is_read' => 0,
-            ]);
+            $permission = new SubrolePermission();
+            $permission->subrole_user_id = $request->subrole_user_id;
+            $permission->role_id = $request->role_id;
+
+            // If the logged-in user is an admin, set admin_id, else set parent_id
+            if ($isAdmin) {
+                $permission->admin_id = $loggedUser->id;
+            } else {
+                $permission->parent_id = $loggedUser->id;
+            }
+
+            // Assign other permissions from the request
+            $permission->dashboard = $request->dashboard ?? 0;
+            $permission->admins = $request->admins ?? 0;
+            $permission->subadmin = $request->subadmin ?? 0;
+            $permission->users = $request->users ?? 0;
+            $permission->drivers = $request->drivers ?? 0;
+            $permission->manager = $request->manager ?? 0;
+            $permission->accountant = $request->accountant ?? 0;
+            $permission->marketing = $request->marketing ?? 0;
+            $permission->b_dashboard = $request->b_dashboard ?? 0;
+            $permission->sharing_new_booking = $request->sharing_new_booking ?? 0;
+            $permission->sharing_confirm = $request->sharing_confirm ?? 0;
+            $permission->sharing_assign = $request->sharing_assign ?? 0;
+            $permission->sharing_accept = $request->sharing_accept ?? 0;
+            $permission->sharing_en_route = $request->sharing_en_route ?? 0;
+            $permission->sharing_complete = $request->sharing_complete ?? 0;
+            $permission->sharing_cancel = $request->sharing_cancel ?? 0;
+            $permission->private_new_booking = $request->private_new_booking ?? 0;
+            $permission->private_confirm = $request->private_confirm ?? 0;
+            $permission->private_assign = $request->private_assign ?? 0;
+            $permission->private_accept = $request->private_accept ?? 0;
+            $permission->private_en_route = $request->private_en_route ?? 0;
+            $permission->private_complete = $request->private_complete ?? 0;
+            $permission->private_cancel = $request->private_cancel ?? 0;
+            $permission->toairport_new_booking = $request->toairport_new_booking ?? 0;
+            $permission->toairport_confirm = $request->toairport_confirm ?? 0;
+            $permission->toairport_assign = $request->toairport_assign ?? 0;
+            $permission->toairport_accept = $request->toairport_accept ?? 0;
+            $permission->toairport_en_route = $request->toairport_en_route ?? 0;
+            $permission->toairport_complete = $request->toairport_complete ?? 0;
+            $permission->toairport_cancel = $request->toairport_cancel ?? 0;
+            $permission->fromairport_new_booking = $request->fromairport_new_booking ?? 0;
+            $permission->fromairport_confirm = $request->fromairport_confirm ?? 0;
+            $permission->fromairport_assign = $request->fromairport_assign ?? 0;
+            $permission->fromairport_accept = $request->fromairport_accept ?? 0;
+            $permission->fromairport_en_route = $request->fromairport_en_route ?? 0;
+            $permission->fromairport_complete = $request->fromairport_complete ?? 0;
+            $permission->fromairport_cancel = $request->fromairport_cancel ?? 0;
+            $permission->drivetest_new_booking = $request->drivetest_new_booking ?? 0;
+            $permission->drivetest_confirm = $request->drivetest_confirm ?? 0;
+            $permission->drivetest_assign = $request->drivetest_assign ?? 0;
+            $permission->drivetest_accept = $request->drivetest_accept ?? 0;
+            $permission->drivetest_en_route = $request->drivetest_en_route ?? 0;
+            $permission->drivetest_complete = $request->drivetest_complete ?? 0;
+            $permission->drivetest_cancel = $request->drivetest_cancel ?? 0;
+            $permission->intercity_new_booking = $request->intercity_new_booking ?? 0;
+            $permission->intercity_confirm = $request->intercity_confirm ?? 0;
+            $permission->intercity_assign = $request->intercity_assign ?? 0;
+            $permission->intercity_accept = $request->intercity_accept ?? 0;
+            $permission->intercity_en_route = $request->intercity_en_route ?? 0;
+            $permission->intercity_complete = $request->intercity_complete ?? 0;
+            $permission->intercity_cancel = $request->intercity_cancel ?? 0;
+            $permission->ab_new_booking = $request->ab_new_booking ?? 0;
+            $permission->ab_confirm = $request->ab_confirm ?? 0;
+            $permission->ab_cancel = $request->ab_cancel ?? 0;
+            $permission->route_new_booking = $request->route_new_booking ?? 0;
+            $permission->route_confirm = $request->route_confirm ?? 0;
+            $permission->route_cancel = $request->route_cancel ?? 0;
+            $permission->out_of_area = $request->out_of_area ?? 0;
+            $permission->cs_dashboard = $request->cs_dashboard ?? 0;
+            $permission->chat_support = $request->chat_support ?? 0;
+            $permission->fm_dashboard = $request->fm_dashboard ?? 0;
+            $permission->deposits = $request->deposits ?? 0;
+            $permission->d_withdraw = $request->d_withdraw ?? 0;
+            $permission->switch = $request->switch ?? 0;
+            $permission->ac_dashboard = $request->ac_dashboard ?? 0;
+            $permission->ads_user = $request->ads_user ?? 0;
+            $permission->ads_on_route = $request->ads_on_route ?? 0;
+            $permission->ads_end_receipt = $request->ads_end_receipt ?? 0;
+            $permission->ads_driver = $request->ads_driver ?? 0;
+            $permission->notify = $request->notify ?? 0;
+            $permission->deals_user = $request->deals_user ?? 0;
+            $permission->deals_driver = $request->deals_driver ?? 0;
+            $permission->website = $request->website ?? 0;
+            $permission->pc_dashboard = $request->pc_dashboard ?? 0;
+            $permission->categeries = $request->categeries ?? 0;
+            $permission->cities = $request->cities ?? 0;
+            $permission->add_sharing = $request->add_sharing ?? 0;
+            $permission->add_private = $request->add_private ?? 0;
+            $permission->add_to_airport = $request->add_to_airport ?? 0;
+            $permission->add_from_airport = $request->add_from_airport ?? 0;
+            $permission->add_drive = $request->add_drive ?? 0;
+            $permission->add_intercity = $request->add_intercity ?? 0;
+            $permission->rates = $request->rates ?? 0;
+            $permission->surge = $request->surge ?? 0;
+            $permission->commission = $request->commission ?? 0;
+            $permission->gt_charges = $request->gt_charges ?? 0;
+            $permission->interac_id = $request->interac_id ?? 0;
+            $permission->payout_info = $request->payout_info ?? 0;
+            $permission->pc_cancel = $request->pc_cancel ?? 0;
+            $permission->r_dashboard = $request->r_dashboard ?? 0;
+            $permission->report = $request->report ?? 0;
+            $permission->s_dashboard = $request->s_dashboard ?? 0;
+            $permission->faq_user = $request->faq_user ?? 0;
+            $permission->faq_driver = $request->faq_driver ?? 0;
+            $permission->tc_user = $request->tc_user ?? 0;
+            $permission->tc_driver = $request->tc_driver ?? 0;
+            $permission->pp_user = $request->pp_user ?? 0;
+            $permission->pp_driver = $request->pp_driver ?? 0;
+            $permission->support = $request->support ?? 0;
+            $permission->date = $request->date ?? 0;
+            $permission->time = $request->time ?? 0;
+            $permission->is_read = 0;
+
+            $permission->save();
 
             return response()->json([
                 'message' => 'Permission created successfully',

@@ -53,6 +53,10 @@ class UserApiController extends Controller
 
         // Existing user login flow
         if ($user) {
+            $tokenResult = $user->createToken('auth_token');
+            $tokenResult->token->guard_name = 'user';
+            $tokenResult->token->save();
+
             // Check login with password
             if ($request->filled('password')) {
                 if ($request->password == $user->password) {
@@ -62,7 +66,7 @@ class UserApiController extends Controller
                             'status' => 'success',
                             'statusCode' => '200',
                             'is_login' => true,
-                            'token' => $user->createToken('auth_token')->accessToken,
+                            'token' => $tokenResult->accessToken,
                             'data' => $user,
                         ], 200);
                     } else {
@@ -71,7 +75,7 @@ class UserApiController extends Controller
                             'status' => 'success',
                             'statusCode' => '200',
                             'is_login' => false,
-                            'token' => $user->createToken('auth_token')->accessToken,
+                            'token' => $tokenResult->accessToken,
                         ], 200);
                     }
                 } else {
@@ -94,7 +98,7 @@ class UserApiController extends Controller
                             'status' => 'success',
                             'statusCode' => '200',
                             'is_login' => true,
-                            'token' => $user->createToken('auth_token')->accessToken,
+                            'token' => $tokenResult->accessToken,
                             'data' => $user,
                         ], 200);
                     } else {
@@ -103,7 +107,7 @@ class UserApiController extends Controller
                             'status' => 'success',
                             'statusCode' => '200',
                             'is_login' => false,
-                            'token' => $user->createToken('auth_token')->accessToken,
+                            'token' => $tokenResult->accessToken,
                         ], 200);
                     }
                 } else {

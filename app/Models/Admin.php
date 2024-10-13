@@ -27,6 +27,14 @@ class Admin extends Authenticatable
         'device_status',
         'device_id',
         'iosdevice_id',
+        'parent_id',
         'create_child',
+        'is_superadmin',
     ];
+
+    public function permissions()
+    {
+        return $this->belongsToMany(Permission::class, 'admin_id', 'permission_id');
+    }
+
 }

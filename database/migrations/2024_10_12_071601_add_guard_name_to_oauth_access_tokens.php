@@ -11,12 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('subroles', function (Blueprint $table) {
-            $table->id();
-            $table->unsignedBigInteger('role_id');
-            $table->foreign('role_id')->references('id')->on('roles')->onDelete('cascade');
-            $table->string('subrole_name', 255);
-            $table->timestamps();
+        Schema::table('oauth_access_tokens', function (Blueprint $table) {
+            $table->string('guard_name')->nullable()->after('name');
         });
     }
 
@@ -25,6 +21,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('subroles');
+        Schema::table('oauth_access_tokens', function (Blueprint $table) {
+            $table->dropColumn('guard_name');
+        });
     }
 };

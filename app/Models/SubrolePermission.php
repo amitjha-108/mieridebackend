@@ -10,6 +10,9 @@ class SubrolePermission extends Model
     use HasFactory;
     protected $fillable = [
         'subrole_user_id',
+        'role_id',
+        'admin_id',
+        'parent_id',
         'dashboard',
         'admins',
         'subadmin',

@@ -15,6 +15,16 @@ return new class extends Migration
             $table->id();
             $table->unsignedBigInteger('subrole_user_id');
             $table->foreign('subrole_user_id')->references('id')->on('subrole_users')->onDelete('cascade');
+
+            $table->unsignedBigInteger('role_id')->nullable();
+            $table->foreign('role_id')->references('id')->on('roles')->onDelete('cascade');
+
+            $table->unsignedBigInteger('admin_id')->nullable(); // Reference to the admin who created the subadmin
+            $table->foreign('admin_id')->references('id')->on('admins')->onDelete('cascade');
+
+            $table->unsignedBigInteger('parent_id')->nullable();
+            $table->foreign('parent_id')->references('id')->on('subrole_users')->onDelete('cascade');
+
             $table->integer('dashboard')->nullable();
             $table->integer('admins')->nullable();
             $table->integer('subadmin')->nullable();
