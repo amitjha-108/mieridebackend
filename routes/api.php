@@ -66,6 +66,8 @@ Route::middleware(['check.guard:subroleuser,admin'])->group(function () {
     Route::post('create-subrole-user', [SubroleUserApiController::class, 'storeSubroleUser']);
     Route::post('assign-permission-to-subrole-user', [SubrolePermissionApiController::class, 'assignPermissionToSubroleUser']);
 
+    Route::get('driver/{id}', [DriverApiController::class, 'getDriverById']);
+
 });
 
 ?>

@@ -487,4 +487,26 @@ class DriverApiController extends Controller
             'data' => $data ,
         ], 200);
     }
+
+    public function getDriverById($id)
+    {
+        $driver = Driver::find($id);
+
+        if (!$driver) {
+            return response()->json([
+                'message' => 'Driver not found',
+                'status' => 'failure',
+                'statusCode' => 404,
+            ], 404);
+        }
+
+        // Return the driver data
+        return response()->json([
+            'message' => 'Driver retrieved successfully',
+            'status' => 'success',
+            'statusCode' => 200,
+            'data' => $driver,
+        ], 200);
+    }
+
 }
