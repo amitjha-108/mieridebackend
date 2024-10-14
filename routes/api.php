@@ -67,6 +67,8 @@ Route::middleware(['check.guard:subroleuser,admin'])->group(function () {
     Route::post('assign-permission-to-subrole-user', [SubrolePermissionApiController::class, 'assignPermissionToSubroleUser']);
 
     Route::get('driver/{id}', [DriverApiController::class, 'getDriverById']);
+    Route::post('edit-driver/{id}', [DriverApiController::class, 'editDriverById']);
+    Route::delete('delete-driver/{id}', [DriverApiController::class, 'deleteDriverById']);
 
 });
 

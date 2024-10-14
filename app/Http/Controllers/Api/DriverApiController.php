@@ -442,26 +442,6 @@ class DriverApiController extends Controller
         ], 200);
     }
 
-    public function deleteDriver($id)
-    {
-        $driver = Driver::find($id);
-
-        if (!$driver) {
-            return response()->json([
-                'message' => 'Driver not found',
-                'status' => 'error',
-                'statusCode' => '404',
-            ], 404);
-        }
-
-        $driver->delete();
-
-        return response()->json([
-            'message' => 'Driver deleted successfully',
-            'status' => 'success',
-            'statusCode' => '200',
-        ], 200);
-    }
     public function listDrivers()
     {
         $drivers = Driver::all();
@@ -496,8 +476,8 @@ class DriverApiController extends Controller
             return response()->json([
                 'message' => 'Driver not found',
                 'status' => 'failure',
-                'statusCode' => 404,
-            ], 404);
+                'statusCode' => 400,
+            ], 400);
         }
 
         // Return the driver data
@@ -506,6 +486,160 @@ class DriverApiController extends Controller
             'status' => 'success',
             'statusCode' => 200,
             'data' => $driver,
+        ], 200);
+    }
+
+    public function editDriverById(Request $request, $id)
+    {
+        $driver = Driver::find($id);
+
+        if (!$driver) {
+            return response()->json([
+                'message' => 'Driver not found',
+                'status' => 'failure',
+                'statusCode' => 400,
+            ], 400);
+        }
+
+        $validator = Validator::make($request->all(), [
+            'first_name' => 'nullable|string|max:255',
+            'last_name'  => 'nullable|string|max:255',
+            'email'      => 'nullable|email|unique:drivers,email,' . $driver->id . '|max:255',
+            'country_code' => 'nullable|string|max:5',
+            'contact'    => 'nullable|string|max:15|unique:drivers,contact,' . $driver->id,
+            'password'   => 'nullable|string|min:6',
+            'image'      => 'nullable|image|mimes:jpeg,png,jpg|max:5120',
+            'vehicle_brand'   => 'nullable|string|max:255',
+            'vehicle_colour'  => 'nullable|string|max:50',
+            'vehicle_date'    => 'nullable|string',
+            'vehicle_no'      => 'nullable|string|max:50',
+            'vehicle_size'    => 'nullable|string|max:50',
+            'licence_image'   => 'nullable|image|mimes:jpeg,png,jpg|max:5120',
+            'insurance_image' => 'nullable|image|mimes:jpeg,png,jpg|max:5120',
+            'ownership_image' => 'nullable|image|mimes:jpeg,png,jpg|max:5120',
+            'driver_lat'      => 'nullable|numeric|min:-90|max:90',
+            'driver_long'     => 'nullable|numeric|min:-180|max:180',
+            'device_status'   => 'nullable|string|max:200',
+            'driver_device_id' => 'nullable|string|max:200',
+            'iosdriver_device_id' => 'nullable|string|max:500',
+            'login_status'    => 'nullable|integer|in:0,1',
+            'login_device_key' => 'nullable|string|max:255',
+            'access_token'    => 'nullable|string|max:255',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'message' => 'Validation Fail',
+                'status' => 'failure',
+                'statusCode' => 400,
+                'data' => $validator->errors(),
+            ], 400);
+        }
+
+        $driver->update($request->only([
+            'first_name',
+            'last_name',
+            'email',
+            'country_code',
+            'contact',
+            'password',
+            'vehicle_brand',
+            'vehicle_colour',
+            'vehicle_date',
+            'vehicle_no',
+            'vehicle_size',
+            'driver_lat',
+            'driver_long',
+            'device_status',
+            'driver_device_id',
+            'iosdriver_device_id',
+            'login_status',
+            'login_device_key',
+            'access_token',
+        ]));
+
+        if ($request->hasFile('image')) {
+            if ($driver->image) {
+                Storage::disk('public')->delete($driver->image);
+            }
+            $image = $request->file('image');
+            $imageName = 'profileImage.' . $image->getClientOriginalExtension();
+            $imagePath = $image->storeAs('Driver/' . $driver->id, $imageName, 'public');
+            $driver->update(['image' => $imagePath]);
+        }
+
+        if ($request->hasFile('licence_image')) {
+            if ($driver->licence_image) {
+                Storage::disk('public')->delete($driver->licence_image);
+            }
+            $licenceImage = $request->file('licence_image');
+            $licenceImageName = 'licenceImage.' . $licenceImage->getClientOriginalExtension();
+            $licenceImagePath = $licenceImage->storeAs('Driver/' . $driver->id, $licenceImageName, 'public');
+            $driver->update(['licence_image' => $licenceImagePath]);
+        }
+
+        if ($request->hasFile('insurance_image')) {
+            if ($driver->insurance_image) {
+                Storage::disk('public')->delete($driver->insurance_image);
+            }
+            $insuranceImage = $request->file('insurance_image');
+            $insuranceImageName = 'insuranceImage.' . $insuranceImage->getClientOriginalExtension();
+            $insuranceImagePath = $insuranceImage->storeAs('Driver/' . $driver->id, $insuranceImageName, 'public');
+            $driver->update(['insurance_image' => $insuranceImagePath]);
+        }
+
+        if ($request->hasFile('ownership_image')) {
+            if ($driver->ownership_image) {
+                Storage::disk('public')->delete($driver->ownership_image);
+            }
+            $ownershipImage = $request->file('ownership_image');
+            $ownershipImageName = 'ownershipImage.' . $ownershipImage->getClientOriginalExtension();
+            $ownershipImagePath = $ownershipImage->storeAs('Driver/' . $driver->id, $ownershipImageName, 'public');
+            $driver->update(['ownership_image' => $ownershipImagePath]);
+        }
+
+        return response()->json([
+            'message' => 'Driver updated successfully',
+            'status' => 'success',
+            'statusCode' => 200,
+            'data' => $driver,
+        ], 200);
+    }
+
+    public function deleteDriverById($id)
+    {
+        $driver = Driver::find($id);
+
+        if (!$driver) {
+            return response()->json([
+                'message' => 'Driver not found',
+                'status' => 'failure',
+                'statusCode' => '400',
+            ], 400);
+        }
+
+        if ($driver->image) {
+            Storage::disk('public')->delete($driver->image);
+        }
+
+        if ($driver->licence_image) {
+            Storage::disk('public')->delete($driver->licence_image);
+        }
+
+        if ($driver->insurance_image) {
+            Storage::disk('public')->delete($driver->insurance_image);
+        }
+
+        if ($driver->ownership_image) {
+            Storage::disk('public')->delete($driver->ownership_image);
+        }
+
+        $driver->delete();
+
+        return response()->json([
+            'message' => 'Driver deleted successfully',
+            'status' => 'success',
+            'statusCode' => '200',
         ], 200);
     }
 
