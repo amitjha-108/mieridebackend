@@ -32,7 +32,9 @@ return new class extends Migration
             $table->string('vehicle_no', 200)->nullable();
             $table->enum('status', ['Disapprove', 'Approve']);
             $table->string('licence_image')->nullable();
+            $table->date('licence_expiry')->nullable();
             $table->string('insurance_image')->nullable();
+            $table->date('insurance_expiry')->nullable();
             $table->string('ownership_image')->nullable();
             $table->integer('wallet_balance')->nullable()->default(0);
             $table->string('verified', 50)->default('');
