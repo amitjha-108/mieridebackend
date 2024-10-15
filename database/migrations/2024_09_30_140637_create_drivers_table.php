@@ -33,9 +33,12 @@ return new class extends Migration
             $table->enum('status', ['Disapprove', 'Approve']);
             $table->string('licence_image')->nullable();
             $table->date('licence_expiry')->nullable();
+            $table->boolean('licence_status')->default(false);
             $table->string('insurance_image')->nullable();
             $table->date('insurance_expiry')->nullable();
+            $table->boolean('insurance_status')->default(false);
             $table->string('ownership_image')->nullable();
+            $table->boolean('ownership_status')->default(false);
             $table->integer('wallet_balance')->nullable()->default(0);
             $table->string('verified', 50)->default('');
             $table->string('verification_code', 50)->default('');

@@ -527,6 +527,9 @@ class DriverApiController extends Controller
             'access_token'    => 'nullable|string|max:255',
             'licence_expiry'    => 'nullable|date',
             'insurance_expiry'    => 'nullable|date',
+            'insurance_status'    => 'nullable|boolean',
+            'licence_status'    => 'nullable|boolean',
+            'ownership_status'    => 'nullable|boolean',
         ]);
 
         if ($validator->fails()) {
@@ -560,6 +563,9 @@ class DriverApiController extends Controller
             'access_token',
             'licence_expiry',
             'insurance_expiry',
+            'licence_status',
+            'insurance_status',
+            'ownership_status',
         ]));
 
         if ($request->hasFile('image')) {
