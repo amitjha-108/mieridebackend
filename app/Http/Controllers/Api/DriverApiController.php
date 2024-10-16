@@ -405,7 +405,10 @@ class DriverApiController extends Controller
             $licenceImage = $request->file('licence_image');
             $licenceImageName = 'licenceImage.' . $licenceImage->getClientOriginalExtension();
             $licenceImagePath = $licenceImage->storeAs('Driver/' . $driver->id, $licenceImageName, 'public');
-            $driver->update(['licence_image' => $licenceImagePath]);
+            $driver->update([
+                'licence_image' => $licenceImagePath,
+                'licence_status' => "0"
+            ]);
         }
 
         if ($request->hasFile('insurance_image')) {
@@ -416,6 +419,7 @@ class DriverApiController extends Controller
             $insuranceImageName = 'insuranceImage.' . $insuranceImage->getClientOriginalExtension();
             $insuranceImagePath = $insuranceImage->storeAs('Driver/' . $driver->id, $insuranceImageName, 'public');
             $driver->update(['insurance_image' => $insuranceImagePath]);
+            $driver->update(['insurance_status' => "0"]);
         }
 
         if ($request->hasFile('ownership_image')) {
@@ -426,6 +430,7 @@ class DriverApiController extends Controller
             $ownershipImageName = 'ownershipImage.' . $ownershipImage->getClientOriginalExtension();
             $ownershipImagePath = $ownershipImage->storeAs('Driver/' . $driver->id, $ownershipImageName, 'public');
             $driver->update(['ownership_image' => $ownershipImagePath]);
+            $driver->update(['ownership_status' => "0"]);
         }
 
         $tokenResult = $driver->createToken('auth_token');
@@ -457,16 +462,38 @@ class DriverApiController extends Controller
     public function getApprovalStatus()
     {
         $driver = auth('driver')->user();
-        $data=[];
-        $data['approvalStatus'] = $driver->status;
+
+        $licenceStatus = $driver->licence_status;
+        $insuranceStatus = $driver->insurance_status;
+        $ownershipStatus = $driver->ownership_status;
+
+        $notifications = [];
+
+        if ($licenceStatus == -1) {
+            $notifications[] = 'Please re-upload your licence document.';
+        }
+
+        if ($insuranceStatus == -1) {
+            $notifications[] = 'Please re-upload your insurance document.';
+        }
+
+        if ($ownershipStatus == -1) {
+            $notifications[] = 'Please re-upload your ownership document.';
+        }
+
+        if (empty($notifications)) {
+            $notifications[] = 'Pending Approval.';
+        }
 
         return response()->json([
             'message' => 'Driver approval status retrieved successfully',
             'status' => 'success',
             'statusCode' => '200',
-            'data' => $data ,
+            'approvalStatus' => $driver->status,
+            'notifications' => $notifications,
         ], 200);
     }
+
 
     public function getDriverById($id)
     {
@@ -527,9 +554,9 @@ class DriverApiController extends Controller
             'access_token'    => 'nullable|string|max:255',
             'licence_expiry'    => 'nullable|date',
             'insurance_expiry'    => 'nullable|date',
-            'insurance_status'    => 'nullable|boolean',
-            'licence_status'    => 'nullable|boolean',
-            'ownership_status'    => 'nullable|boolean',
+            'insurance_status'    => 'nullable|string',
+            'licence_status'    => 'nullable|string',
+            'ownership_status'    => 'nullable|string',
         ]);
 
         if ($validator->fails()) {
