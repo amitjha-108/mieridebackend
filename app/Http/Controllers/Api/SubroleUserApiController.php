@@ -51,11 +51,11 @@ class SubroleUserApiController extends Controller
         $loggedUser = null;
         $isAdmin = false;
 
-        if (auth('admin')->user()->token()->guard_name == 'admin') {
+        if (auth('admin')->check() && auth('admin')->user()->token()->guard_name == 'admin') {
             $loggedUser = auth('admin')->user();
             $isAdmin = true;
         }
-        elseif (auth('subroleuser')->user()->token()->guard_name == 'subroleuser') {
+        elseif (auth('subroleuser')->check() && auth('subroleuser')->user()->token()->guard_name == 'subroleuser') {
             $loggedUser = auth('subroleuser')->user();
         }
 

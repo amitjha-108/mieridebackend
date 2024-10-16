@@ -35,11 +35,11 @@ class RoleApiController extends Controller
         $createdByAdminId = null;
         $createdBySubroleUserId = null;
 
-        if (auth('admin')->user()->token()->guard_name == 'admin') {
+        if (auth('admin')->check() && auth('admin')->user()->token()->guard_name == 'admin') {
             $createdByAdminId = auth('admin')->user()->id;
             $createdByRoleId = auth('admin')->user()->role_id;
         }
-        elseif(auth('subroleuser')->user()->token()->guard_name == 'subroleuser') {
+        elseif(auth('subroleuser')->check() && auth('subroleuser')->user()->token()->guard_name == 'subroleuser') {
             $createdBySubroleUserId = auth('subroleuser')->user()->id;
             $createdByRoleId = auth('subroleuser')->user()->role_id;
         }
@@ -65,12 +65,12 @@ class RoleApiController extends Controller
         $createdByAdminId = null;
         $createdBySubroleUserId = null;
 
-        if (auth('admin')->user()->token()->guard_name == 'admin') {
+        if (auth('admin')->check() && auth('admin')->user()->token()->guard_name == 'admin') {
             $createdByAdminId = auth('admin')->user()->id;
             // $roles = Role::select('id', 'name')->where('created_by_admin_id', $createdByAdminId)->with('permissions')->get();
             $roles = Role::select('id', 'name')->with('permissions')->get();
         }
-        elseif (auth('subroleuser')->user()->token()->guard_name == 'subroleuser') {
+        elseif (auth('subroleuser')->check() && auth('subroleuser')->user()->token()->guard_name == 'subroleuser') {
             $createdBySubroleUserId = auth('subroleuser')->user()->id;
             $createdByRoleId = auth('subroleuser')->user()->role_id;
             $roles = Role::select('id', 'name')->where('created_by_subroleuser_id', $createdBySubroleUserId)->orWhere('created_by_role_id',$createdByRoleId)->with('permissions')->get();
