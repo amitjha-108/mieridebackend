@@ -557,6 +557,7 @@ class DriverApiController extends Controller
             'insurance_status'    => 'nullable|string',
             'licence_status'    => 'nullable|string',
             'ownership_status'    => 'nullable|string',
+            'status'    => 'nullable|string',
         ]);
 
         if ($validator->fails()) {
@@ -593,6 +594,7 @@ class DriverApiController extends Controller
             'licence_status',
             'insurance_status',
             'ownership_status',
+            'status',
         ]));
 
         if ($request->hasFile('image')) {
