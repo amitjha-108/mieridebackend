@@ -76,11 +76,15 @@ class RoleApiController extends Controller
 
     public function listRoles()
     {
-        $createdByAdminId = null;
-        $createdBySubroleUserId = null;
-
         if (auth('admin')->check() && auth('admin')->user()->token()->guard_name == 'admin') {
-            $roles = Role::select('id', 'name')->with('permissions')->where('name', '!=', 'Superadmin')->get();
+            $roleId = auth('admin')->user()->role_id;
+            if($roleId){
+                $roles = Role::select('id', 'name')->with('permissions')->where('name', '!=', 'Superadmin')->where('role_id',$roleId)->get();
+            }
+            else{
+                $roles = Role::select('id', 'name')->with('permissions')->where('name', '!=', 'Superadmin')->get();
+            }
+
         }
         elseif (auth('subroleuser')->check() && auth('subroleuser')->user()->token()->guard_name == 'subroleuser') {
             $roleId = auth('subroleuser')->user()->role_id;
