@@ -403,7 +403,7 @@ class AdminApiController extends Controller
         }
 
         $permissions = [];
-        $permissions = SubrolePermission::where('subrole_user_id', $subroleuser->id)->get();
+        $permissions = Permission::where('role_id', $subroleuser->role_id)->get();
 
          // Add guard_name to token
         $tokenResult = $subroleuser->createToken('auth_token');

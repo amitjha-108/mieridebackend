@@ -100,4 +100,37 @@ class RoleApiController extends Controller
         ], 200);
     }
 
+    public function listSubroles($roleId)
+    {
+        if (auth('admin')->check() && auth('admin')->user()->token()->guard_name == 'admin') {
+
+            if(auth('admin')->user()->is_superadmin){
+                if ($roleId) {
+                    $roles = Role::select('id', 'name')->with('permissions')->where('name', '!=', 'Superadmin')->where('role_id', $roleId)->get();
+                }
+
+                // Return the list of roles
+                return response()->json([
+                    'message' => 'Role list retrieved successfully',
+                    'status' => 'success',
+                    'statusCode' => '200',
+                    'data' => $roles,
+                ], 200);
+            }else{
+                return response()->json([
+                    'message' => 'Unauthorized',
+                    'status' => 'failure',
+                    'statusCode' => '400'
+                ], 400);
+            }
+        }
+
+        return response()->json([
+            'message' => 'Unauthorized',
+            'status' => 'failure',
+            'statusCode' => '400'
+        ], 400);
+    }
+
+
 }

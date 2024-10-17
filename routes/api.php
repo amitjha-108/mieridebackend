@@ -63,7 +63,8 @@ Route::middleware(['check.guard:subroleuser,admin'])->group(function () {
     Route::post('store-role', [RoleApiController::class, 'storeRoles']);
     Route::post('store-subrole', [RoleApiController::class, 'storeSubRoles']);
     Route::get('list-roles', [RoleApiController::class, 'listRoles']);
-    
+    Route::get('list-subroles/{roleId}', [RoleApiController::class, 'listSubroles']);
+
     Route::post('create-subrole-user', [SubroleUserApiController::class, 'storeSubroleUser']);
 
     Route::get('driver/{id}', [DriverApiController::class, 'getDriverById']);
