@@ -175,6 +175,13 @@ class AdminApiController extends Controller
                     'is_read' => 1,
                 ]
             );
+
+            Role::updateOrCreate(
+                [
+                    'role_id' => 1,
+                    'name' => "Superadmin",
+                ]
+            );
         }
         else {
             Permission::updateOrCreate(

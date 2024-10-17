@@ -10,7 +10,6 @@ use App\Http\Controllers\Api\QueryApiController;
 use App\Http\Controllers\Api\RoleApiController;
 use App\Http\Controllers\Api\PermissionApiController;
 use App\Http\Controllers\Api\SubroleUserApiController;
-use App\Http\Controllers\Api\SubrolePermissionApiController;
 
 
 // Public route for sending OTP
@@ -62,9 +61,10 @@ Route::middleware(['check.guard:subroleuser'])->group(function () {
 
 Route::middleware(['check.guard:subroleuser,admin'])->group(function () {
     Route::post('store-role', [RoleApiController::class, 'storeRoles']);
+    Route::post('store-subrole', [RoleApiController::class, 'storeSubRoles']);
     Route::get('list-roles', [RoleApiController::class, 'listRoles']);
+    
     Route::post('create-subrole-user', [SubroleUserApiController::class, 'storeSubroleUser']);
-    Route::post('assign-permission-to-subrole-user', [SubrolePermissionApiController::class, 'assignPermissionToSubroleUser']);
 
     Route::get('driver/{id}', [DriverApiController::class, 'getDriverById']);
     Route::post('edit-driver/{id}', [DriverApiController::class, 'editDriverById']);
