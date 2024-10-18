@@ -457,7 +457,7 @@ class AdminApiController extends Controller
                 'message' => 'Email not registered',
                 'status' => 'failure',
                 'statusCode' => '400',
-            ], 400);
+            ], 200);
         }
 
         // Check password
