@@ -307,7 +307,123 @@ class AdminApiController extends Controller
         ], 201);
     }
 
-    public function loginAdministrator(Request $request)
+    // public function loginAdministrator(Request $request)
+    // {
+    //     $validator = Validator::make($request->all(), [
+    //         'email' => 'required|string|email|max:150',
+    //         'password' => 'required|string|min:6',
+    //     ]);
+
+    //     if ($validator->fails()) {
+    //         return response()->json([
+    //             'message' => 'Validation failed',
+    //             'status' => 'failure',
+    //             'statusCode' => '400',
+    //             'data' => $validator->errors(),
+    //         ], 400);
+    //     }
+
+    //     $administrator = Admin::where('email', $request->email)->first();
+
+    //     if (!$administrator) {
+    //         return response()->json([
+    //             'message' => 'Email not registered',
+    //             'status' => 'failure',
+    //             'statusCode' => '400',
+    //         ], 400);
+    //     }
+
+    //     if ($request->password != $administrator->password) {
+    //         return response()->json([
+    //             'message' => 'Incorrect password',
+    //             'status' => 'failure',
+    //             'statusCode' => '400',
+    //         ], 200);
+    //     }
+
+    //     $permissions = [];
+    //     $permissions = Permission::where('admin_id', $administrator->id)->orWhere('role_id',$administrator->role_id)
+    //                     ->get()->makeHidden(['admin_id','created_at','updated_at']);
+
+    //     $grantedPermissions = $permissions->map(function ($permission) {
+    //         return collect($permission)->filter(function ($value, $key) {
+    //             return $value != 0 && !in_array($key, ['id', 'role_id']);
+    //         });
+    //     });
+
+    //     $tokenResult = $administrator->createToken('auth_token');
+    //     $tokenResult->token->guard_name = 'admin';
+    //     $tokenResult->token->save();
+
+    //     return response()->json([
+    //         'message' => 'Login successfully',
+    //         'status' => 'success',
+    //         'statusCode' => '200',
+    //         'userType' => $administrator->role_id,
+    //         'createChild' => $administrator->create_child,
+    //         'token' => $tokenResult->accessToken,
+    //         'tokenGuard' => $tokenResult->token->guard_name,
+    //         'data' => $administrator,
+    //         'permissions' => $grantedPermissions,
+    //     ], 200);
+    // }
+
+    // public function loginSubroleUser(Request $request)
+    // {
+    //     $validator = Validator::make($request->all(), [
+    //         'email' => 'required|string|email|max:150',
+    //         'password' => 'required|string|min:6',
+    //     ]);
+
+    //     if ($validator->fails()) {
+    //         return response()->json([
+    //             'message' => 'Validation failed',
+    //             'status' => 'failure',
+    //             'statusCode' => '400',
+    //             'data' => $validator->errors(),
+    //         ], 400);
+    //     }
+
+    //     $subroleuser = SubroleUser::where('email', $request->email)->first();
+
+    //     if (!$subroleuser) {
+    //         return response()->json([
+    //             'message' => 'Email not registered',
+    //             'status' => 'failure',
+    //             'statusCode' => '400',
+    //         ], 400);
+    //     }
+
+    //     if ($request->password != $subroleuser->password) {
+    //         return response()->json([
+    //             'message' => 'Incorrect password',
+    //             'status' => 'failure',
+    //             'statusCode' => '400',
+    //         ], 200);
+    //     }
+
+    //     $permissions = [];
+    //     $permissions = Permission::where('role_id', $subroleuser->role_id)->get();
+
+    //      // Add guard_name to token
+    //     $tokenResult = $subroleuser->createToken('auth_token');
+    //     $tokenResult->token->guard_name = 'subroleuser';
+    //     $tokenResult->token->save();
+
+    //     return response()->json([
+    //         'message' => 'Subrole User Login successfully',
+    //         'status' => 'success',
+    //         'statusCode' => '200',
+    //         'userType' => $subroleuser->role_id,
+    //         'createChild' => $subroleuser->create_child,
+    //         'token' => $tokenResult->accessToken,
+    //         'tokenGuard' => $tokenResult->token->guard_name,
+    //         'data' => $subroleuser,
+    //         'permissions' => $permissions,
+    //     ], 200);
+    // }
+
+    public function login(Request $request)
     {
         $validator = Validator::make($request->all(), [
             'email' => 'required|string|email|max:150',
@@ -323,9 +439,20 @@ class AdminApiController extends Controller
             ], 400);
         }
 
-        $administrator = Admin::where('email', $request->email)->first();
+        // First, try to find the user in the Admin table
+        $user = Admin::where('email', $request->email)->first();
+        $userType = 'admin';
+        $guard = 'admin';
 
-        if (!$administrator) {
+        // If the user is not an admin, check the SubroleUser table
+        if (!$user) {
+            $user = SubroleUser::where('email', $request->email)->first();
+            $userType = 'subroleuser';
+            $guard = 'subroleuser';
+        }
+
+        // If no user found in both tables
+        if (!$user) {
             return response()->json([
                 'message' => 'Email not registered',
                 'status' => 'failure',
@@ -333,7 +460,8 @@ class AdminApiController extends Controller
             ], 400);
         }
 
-        if ($request->password != $administrator->password) {
+        // Check password
+        if ($request->password != $user->password) {
             return response()->json([
                 'message' => 'Incorrect password',
                 'status' => 'failure',
@@ -341,9 +469,8 @@ class AdminApiController extends Controller
             ], 200);
         }
 
-        $permissions = [];
-        $permissions = Permission::where('admin_id', $administrator->id)->orWhere('role_id',$administrator->role_id)
-                        ->get()->makeHidden(['admin_id','created_at','updated_at']);
+        // Fetch permissions based on role_id
+        $permissions = Permission::where('role_id', $user->role_id)->get()->makeHidden(['created_at', 'updated_at']);
 
         $grantedPermissions = $permissions->map(function ($permission) {
             return collect($permission)->filter(function ($value, $key) {
@@ -351,75 +478,21 @@ class AdminApiController extends Controller
             });
         });
 
-        $tokenResult = $administrator->createToken('auth_token');
-        $tokenResult->token->guard_name = 'admin';
+        // Generate access token with guard
+        $tokenResult = $user->createToken('auth_token');
+        $tokenResult->token->guard_name = $guard;
         $tokenResult->token->save();
 
         return response()->json([
-            'message' => 'Login successfully',
+            'message' => ucfirst($userType) . ' login successfully',
             'status' => 'success',
             'statusCode' => '200',
-            'userType' => $administrator->role_id,
-            'createChild' => $administrator->create_child,
+            'userType' => $user->role_id,
+            'createChild' => $user->create_child,
             'token' => $tokenResult->accessToken,
             'tokenGuard' => $tokenResult->token->guard_name,
-            'data' => $administrator,
+            'data' => $user,
             'permissions' => $grantedPermissions,
-        ], 200);
-    }
-
-    public function loginSubroleUser(Request $request)
-    {
-        $validator = Validator::make($request->all(), [
-            'email' => 'required|string|email|max:150',
-            'password' => 'required|string|min:6',
-        ]);
-
-        if ($validator->fails()) {
-            return response()->json([
-                'message' => 'Validation failed',
-                'status' => 'failure',
-                'statusCode' => '400',
-                'data' => $validator->errors(),
-            ], 400);
-        }
-
-        $subroleuser = SubroleUser::where('email', $request->email)->first();
-
-        if (!$subroleuser) {
-            return response()->json([
-                'message' => 'Email not registered',
-                'status' => 'failure',
-                'statusCode' => '400',
-            ], 400);
-        }
-
-        if ($request->password != $subroleuser->password) {
-            return response()->json([
-                'message' => 'Incorrect password',
-                'status' => 'failure',
-                'statusCode' => '400',
-            ], 200);
-        }
-
-        $permissions = [];
-        $permissions = Permission::where('role_id', $subroleuser->role_id)->get();
-
-         // Add guard_name to token
-        $tokenResult = $subroleuser->createToken('auth_token');
-        $tokenResult->token->guard_name = 'subroleuser';
-        $tokenResult->token->save();
-
-        return response()->json([
-            'message' => 'Subrole User Login successfully',
-            'status' => 'success',
-            'statusCode' => '200',
-            'userType' => $subroleuser->role_id,
-            'createChild' => $subroleuser->create_child,
-            'token' => $tokenResult->accessToken,
-            'tokenGuard' => $tokenResult->token->guard_name,
-            'data' => $subroleuser,
-            'permissions' => $permissions,
         ], 200);
     }
 

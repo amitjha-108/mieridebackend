@@ -23,6 +23,7 @@ Route::post('store-query', [QueryApiController::class, 'storeQueries']);
 
 Route::post('register-administrator', [AdminApiController::class, 'registerAdministrator']);
 Route::post('login-administrator', [AdminApiController::class, 'loginAdministrator']);
+Route::post('login', [AdminApiController::class, 'login']);
 
 Route::post('login-subrole-user', [AdminApiController::class, 'loginSubroleUser']);
 
