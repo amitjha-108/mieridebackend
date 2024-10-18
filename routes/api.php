@@ -65,6 +65,7 @@ Route::middleware(['check.guard:subroleuser,admin'])->group(function () {
     Route::post('store-subrole', [RoleApiController::class, 'storeSubRoles']);
     Route::get('list-roles', [RoleApiController::class, 'listRoles']);
     Route::get('list-subroles/{roleId}', [RoleApiController::class, 'listSubroles']);
+    Route::get('list-permissions-name', [PermissionApiController::class, 'permissionNamesList']);
 
     Route::post('create-subrole-user', [SubroleUserApiController::class, 'storeSubroleUser']);
 

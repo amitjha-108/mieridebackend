@@ -13,6 +13,8 @@ use Illuminate\Support\Facades\Validator;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\DB;
 
 class PermissionApiController extends Controller
 {
@@ -399,6 +401,21 @@ class PermissionApiController extends Controller
             'statusCode' => '200',
             'data' => $permission,
         ], 200);
+    }
+
+    public function permissionNamesList()
+    {
+        $columns = Schema::getColumnListing('permissions');
+
+        $exclude = ['id', 'role_id','admin_id','date','time', 'created_at', 'updated_at'];
+        $filteredColumns = array_diff($columns, $exclude);
+
+        return response()->json([
+            'message' => 'Permission field names fetched successfully',
+            'status' => 'success',
+            'statusCode' => 200,
+            'data' => array_values($filteredColumns),
+        ],200);
     }
 
 }
