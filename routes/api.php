@@ -10,6 +10,7 @@ use App\Http\Controllers\Api\QueryApiController;
 use App\Http\Controllers\Api\RoleApiController;
 use App\Http\Controllers\Api\PermissionApiController;
 use App\Http\Controllers\Api\SubroleUserApiController;
+use App\Http\Controllers\Api\RideCategoryApiController;
 
 
 // Public route for sending OTP
@@ -23,9 +24,10 @@ Route::post('store-query', [QueryApiController::class, 'storeQueries']);
 
 Route::post('register-administrator', [AdminApiController::class, 'registerAdministrator']);
 Route::post('login-administrator', [AdminApiController::class, 'loginAdministrator']);
-Route::post('login', [AdminApiController::class, 'login']);
-
 Route::post('login-subrole-user', [AdminApiController::class, 'loginSubroleUser']);
+
+Route::post('login', [AdminApiController::class, 'login']);
+Route::get('list-ride-category', [RideCategoryApiController::class, 'listRideCategories']);
 
 
 
@@ -42,17 +44,13 @@ Route::middleware(['check.guard:driver'])->group(function () {
 });
 
 Route::middleware(['check.guard:admin'])->group(function () {
-    Route::get('/list-users', [UserApiController::class, 'listUsers']);
-    Route::get('/list-drivers', [DriverApiController::class, 'listDrivers']);
-    Route::delete('/delete-driver/{id}', [DriverApiController::class, 'deleteDriver']);
-    Route::get('list-queries', [QueryApiController::class, 'listQueries']);
-
-    Route::post('assign-permission-to-role', [PermissionApiController::class, 'assignPermissionToRole']);
-    Route::post('update-permission-to-role', [PermissionApiController::class, 'updatePermissionForRole']);
-
     Route::post('create-admin', [AdminApiController::class, 'createAdmin']);
     Route::get('list-admins', [AdminApiController::class, 'listAdmins']);
 
+    Route::post('store-ride-category', [RideCategoryApiController::class, 'storeRideCategory']);
+    Route::post('edit-ride-category/{id}', [RideCategoryApiController::class, 'editRideCategory']);
+    Route::delete('delete-ride-category/{id}', [RideCategoryApiController::class, 'deleteRideCategory']);
+    Route::post('update-ride-category-status/{id}', [RideCategoryApiController::class, 'updateRideCategoryStatus']);
 
 });
 
@@ -72,6 +70,14 @@ Route::middleware(['check.guard:subroleuser,admin'])->group(function () {
     Route::get('driver/{id}', [DriverApiController::class, 'getDriverById']);
     Route::post('edit-driver/{id}', [DriverApiController::class, 'editDriverById']);
     Route::delete('delete-driver/{id}', [DriverApiController::class, 'deleteDriverById']);
+
+    Route::get('/list-users', [UserApiController::class, 'listUsers']);
+    Route::get('/list-drivers', [DriverApiController::class, 'listDrivers']);
+    Route::delete('/delete-driver/{id}', [DriverApiController::class, 'deleteDriver']);
+    Route::get('list-queries', [QueryApiController::class, 'listQueries']);
+
+    Route::post('assign-permission-to-role', [PermissionApiController::class, 'assignPermissionToRole']);
+    Route::post('update-permission-to-role', [PermissionApiController::class, 'updatePermissionForRole']);
 
 });
 
