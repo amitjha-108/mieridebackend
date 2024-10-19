@@ -23,8 +23,8 @@ Route::post('register-driver', [DriverApiController::class, 'registerDriver']);
 Route::post('store-query', [QueryApiController::class, 'storeQueries']);
 
 Route::post('register-administrator', [AdminApiController::class, 'registerAdministrator']);
-Route::post('login-administrator', [AdminApiController::class, 'loginAdministrator']);
-Route::post('login-subrole-user', [AdminApiController::class, 'loginSubroleUser']);
+// Route::post('login-administrator', [AdminApiController::class, 'loginAdministrator']);
+// Route::post('login-subrole-user', [AdminApiController::class, 'loginSubroleUser']);
 
 Route::post('login', [AdminApiController::class, 'login']);
 Route::get('list-ride-category', [RideCategoryApiController::class, 'listRideCategories']);
@@ -74,7 +74,6 @@ Route::middleware(['check.guard:subroleuser,admin'])->group(function () {
 
     Route::get('/list-users', [UserApiController::class, 'listUsers']);
     Route::get('/list-drivers', [DriverApiController::class, 'listDrivers']);
-    Route::delete('/delete-driver/{id}', [DriverApiController::class, 'deleteDriver']);
     Route::get('list-queries', [QueryApiController::class, 'listQueries']);
 
     Route::post('assign-permission-to-role', [PermissionApiController::class, 'assignPermissionToRole']);
