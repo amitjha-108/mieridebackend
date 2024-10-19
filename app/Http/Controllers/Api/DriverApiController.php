@@ -470,15 +470,15 @@ class DriverApiController extends Controller
         $notifications = [];
 
         if ($licenceStatus == -1) {
-            $notifications[] = 'Please re-upload your licence document.';
+            $notifications['licence_image'] = 'Please re-upload your licence document.';
         }
 
         if ($insuranceStatus == -1) {
-            $notifications[] = 'Please re-upload your insurance document.';
+            $notifications['insurance_image'] = 'Please re-upload your insurance document.';
         }
 
         if ($ownershipStatus == -1) {
-            $notifications[] = 'Please re-upload your ownership document.';
+            $notifications['ownership_image'] = 'Please re-upload your ownership document.';
         }
 
         if (empty($notifications)) {
