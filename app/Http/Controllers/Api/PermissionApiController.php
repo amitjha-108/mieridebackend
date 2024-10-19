@@ -418,4 +418,48 @@ class PermissionApiController extends Controller
         ],200);
     }
 
+    public function listRolesWithPermissions()
+    {
+        $user = auth('admin')->user();
+
+        if (!$user || !$user->is_superadmin) {
+            return response()->json([
+                'message' => 'Unauthorized access',
+                'status' => 'failure',
+                'statusCode' => '400',
+            ], 400);
+        }
+
+        $exclude = ['id', 'role_id', 'admin_id', 'date', 'time', 'created_at', 'updated_at'];
+
+        $roles = Role::select('id', 'name')
+            ->with(['permissions' => function ($query) {
+                $query->select('permissions.*');
+            }])->where('name', '!=', 'Superadmin')->get();
+
+        // Now loop over each role and apply makeHidden to each permission
+        $roles->each(function ($role) use ($exclude) {
+            $role->permissions->each(function ($permission) use ($exclude) {
+                $permission->makeHidden($exclude);
+            });
+        });
+
+
+        $roleNames = Role::select('id', 'name')->where('name', '!=', 'Superadmin')->get();
+        $permissionColumns = Schema::getColumnListing('permissions');
+        $exclude = ['id', 'role_id','admin_id','date','time', 'created_at', 'updated_at'];
+        $filteredpermissionColumns = array_diff($permissionColumns, $exclude);
+
+
+        return response()->json([
+            'message' => 'Roles and permissions retrieved successfully',
+            'status' => 'success',
+            'statusCode' => 200,
+            'roleNames' => $roleNames,
+            'permissionNames' => array_values($filteredpermissionColumns),
+            'data' => $roles,
+        ], 200);
+    }
+
+
 }
