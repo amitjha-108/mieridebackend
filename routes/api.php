@@ -73,7 +73,7 @@ Route::middleware(['check.guard:subroleuser,admin'])->group(function () {
     Route::delete('delete-driver/{id}', [DriverApiController::class, 'deleteDriverById']);
 
     Route::get('/list-users', [UserApiController::class, 'listUsers']);
-    Route::get('/ -drivers', [DriverApiController::class, 'listDrivers']);
+    Route::get('/list-drivers', [DriverApiController::class, 'listDrivers']);
     Route::get('list-queries', [QueryApiController::class, 'listQueries']);
 
     Route::post('assign-permission-to-role', [PermissionApiController::class, 'assignPermissionToRole']);
