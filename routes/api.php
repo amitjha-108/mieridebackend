@@ -11,6 +11,7 @@ use App\Http\Controllers\Api\RoleApiController;
 use App\Http\Controllers\Api\PermissionApiController;
 use App\Http\Controllers\Api\SubroleUserApiController;
 use App\Http\Controllers\Api\RideCategoryApiController;
+use App\Http\Controllers\Api\PriceApiController;
 
 
 // Public route for sending OTP
@@ -46,6 +47,10 @@ Route::middleware(['check.guard:driver'])->group(function () {
 Route::middleware(['check.guard:admin'])->group(function () {
     Route::post('create-admin', [AdminApiController::class, 'createAdmin']);
     Route::get('list-admins', [AdminApiController::class, 'listAdmins']);
+
+    Route::post('store-personal-ride-price', [PriceApiController::class, 'storePersonalRidePrice']);
+    Route::post('store-sharing-ride-price', [PriceApiController::class, 'storeSharingRidePrice']);
+    Route::post('store-test-drive-ride-price', [PriceApiController::class, 'storeTestdriveRidePrice']);
 
     Route::post('store-ride-category', [RideCategoryApiController::class, 'storeRideCategory']);
     Route::post('edit-ride-category/{id}', [RideCategoryApiController::class, 'editRideCategory']);
