@@ -29,6 +29,7 @@ Route::post('register-administrator', [AdminApiController::class, 'registerAdmin
 
 Route::post('login', [AdminApiController::class, 'login']);
 Route::get('list-ride-category', [RideCategoryApiController::class, 'listRideCategories']);
+Route::post('get-ride-price', [PriceApiController::class, 'getRidePrice']);
 
 
 

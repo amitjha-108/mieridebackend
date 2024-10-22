@@ -18,4 +18,9 @@ class Price extends Model
         'drive_price',
         'test_location',
     ];
+
+    public function categoryDetails()
+    {
+        return $this->belongsTo(RideCategory::class, 'category_id', 'id');
+    }
 }

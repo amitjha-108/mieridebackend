@@ -106,4 +106,55 @@ class PriceApiController extends Controller
             'data' => $price,
         ], 200);
     }
+
+    public function getRidePrice(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'category_id' => 'required|exists:ride_categories,id',
+            'source' => 'required|string',
+            'destination' => 'required|string',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'message' => 'Validation Fail',
+                'status' => 'failure',
+                'statusCode' => '400',
+                'data' => $validator->errors(),
+            ], 400);
+        }
+
+        // $price = Price::with('categoryDetails')->where('category_id', $request->category_id)
+        $price = Price::where('category_id', $request->category_id)
+                    ->where('source', $request->source)
+                    ->where('destination', $request->destination)
+                    ->first();
+
+        if (!$price) {
+            return response()->json([
+                'message' => 'Price not found',
+                'status' => 'failure',
+                'statusCode' => '404',
+            ], 404);
+        }
+
+        // Make hidden fields and filter out null values
+        $filteredPrice = array_filter(
+            $price->makeHidden(['created_at', 'updated_at'])->toArray(),
+            function ($value) {
+                return !is_null($value);
+            }
+        );
+
+        // if($price->categoryDetails->name == "Sharing Ride"){
+
+        // }
+        return response()->json([
+            'message' => 'Price fetched successfully',
+            'status' => 'success',
+            'statusCode' => '200',
+            'data' => $filteredPrice,
+        ], 200);
+    }
+
 }
