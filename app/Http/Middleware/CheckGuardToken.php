@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\Auth;
 class CheckGuardToken
 {
     public function handle(Request $request, Closure $next, ...$guards): Response
-    {
+    {   //dd($guards);
         //if request has no token then return message
         if (!$request->headers->has('Authorization')) {
             return response()->json(['message' => 'Token required'], 401);
