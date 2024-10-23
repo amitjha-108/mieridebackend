@@ -150,7 +150,7 @@ class UserApiController extends Controller
                         'status' => 'success',
                         'statusCode' => '200',
                         'is_login' => false,
-                        'token' => $user->createToken('auth_token')->accessToken,
+                        'token' => $tokenResult->accessToken,
                         'data' => $user,
                     ], 200);
                 } else {
