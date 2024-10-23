@@ -145,12 +145,17 @@ class UserApiController extends Controller
                     $user->otp = $request->otp;
                     $user->save();
 
+                    //inject guard_name
+                    $tokenResult = $user->createToken('auth_token');
+                    $tokenResult->token->guard_name = 'user';
+                    $tokenResult->token->save();
+
                     return response()->json([
                         'message' => 'User created successfully',
                         'status' => 'success',
                         'statusCode' => '200',
                         'is_login' => false,
-                        'token' => $user->createToken('auth_token')->accessToken,
+                        'token' => $tokenResult->accessToken,
                         'data' => $user,
                     ], 200);
                 } else {
