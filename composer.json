@@ -27,6 +27,9 @@
         }
     },
     "autoload-dev": {
+        "files": [
+            "app/Helper/image-manager.php"
+        ],
         "psr-4": {
             "Tests\\": "tests/"
         }

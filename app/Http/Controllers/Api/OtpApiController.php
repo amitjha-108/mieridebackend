@@ -13,7 +13,7 @@ use Illuminate\Support\Facades\Validator;
 class OtpApiController extends Controller
 {
     public function sendUserOTP(Request $request)
-    {
+    {   //dd($request->all());
         $validator = Validator::make($request->all(), [
             'country_code' => 'required',
             'contact' => 'required',

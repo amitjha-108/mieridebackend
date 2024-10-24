@@ -12,7 +12,8 @@ use App\Http\Controllers\Api\PermissionApiController;
 use App\Http\Controllers\Api\SubroleUserApiController;
 use App\Http\Controllers\Api\RideCategoryApiController;
 use App\Http\Controllers\Api\PriceApiController;
-
+require_once __DIR__ . '/api/user.php';
+require_once __DIR__ . '/api/admin.php';
 
 // Public route for sending OTP
 Route::post('/get-user-otp', [OtpApiController::class, 'sendUserOTP']);
@@ -34,10 +35,6 @@ Route::post('get-ride-price', [PriceApiController::class, 'getRidePrice']);
 
 
 
-Route::middleware(['api'])->group(function () {
-    Route::post('complete-user-profile', [UserApiController::class, 'completeUserProfile']);
-
-});
 
 Route::middleware(['check.guard:driver'])->group(function () {
     Route::post('complete-driver-profile', [DriverApiController::class, 'completeDriverProfile']);

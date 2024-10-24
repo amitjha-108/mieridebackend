@@ -2,20 +2,22 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
-use Twilio\Rest\Client;
+use App\Helper\ImageManager;
+use Carbon\Carbon;
 use App\Models\User;
 use App\Models\TempOtp;
-use Illuminate\Support\Facades\Validator;
-use Carbon\Carbon;
-use Illuminate\Support\Facades\Hash;
+use Twilio\Rest\Client;
+use Illuminate\Http\Request;
+use App\Http\Controllers\Controller;
+use App\Models\Fund;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\{Validator, DB, Storage};
 
 class UserApiController extends Controller
 {
     public function loginWithOtporPassword(Request $request)
-    {
+    {   //dd(12);
         $validator = Validator::make($request->all(), [
             'country_code' => 'required',
             'contact' => 'required',
@@ -35,7 +37,7 @@ class UserApiController extends Controller
         $user = User::where('country_code', $request->country_code)->where('contact', $request->contact)->first();
 
         // Reusable OTP validation logic
-        $checkOtpExpiryAndMatch = function($otp, $otpModel) {
+        $checkOtpExpiryAndMatch = function ($otp, $otpModel) {
             $otpCreatedTime = Carbon::parse($otpModel->updated_at);
 
             // Check if OTP is expired (older than 2 minutes)
@@ -188,7 +190,7 @@ class UserApiController extends Controller
             'first_name' => 'required|string|max:255',
             'last_name' => 'required|string|max:255',
             'gender' => 'required|in:Male,Female,Other',
-            'email' => 'required|email|unique:users,email,' . auth()->guard('api')->user()->id,
+            'email' => 'required|email|unique:users,email,' . auth()->guard('user')->user()->id,
             'password' => 'required|string|min:6|max:6',
             'image' => 'nullable|image|mimes:jpeg,png,jpg|max:5120', // 5MB max size
         ]);
@@ -202,7 +204,7 @@ class UserApiController extends Controller
             ], 400);
         }
 
-        $user = auth()->guard('api')->user();
+        $user = auth()->guard('user')->user();
 
         if ($user) {
             // Update user fields
@@ -233,8 +235,7 @@ class UserApiController extends Controller
                 'statusCode' => '200',
                 'data' => $user,
             ], 200);
-        }
-        else {
+        } else {
             return response()->json([
                 'message' => 'User not found',
                 'status' => 'failure',
@@ -255,5 +256,66 @@ class UserApiController extends Controller
         ], 200);
     }
 
+    public function fundPost(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'amount' => 'required',
+            'email' => 'required|email',
+            'image' => 'required',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'message' => 'Validation Fail',
+                'status' => 'failure',
+                'statusCode' => '400',
+                'data' => $validator->errors(),
+            ], 400);
+        }
+
+        $user = auth()->guard('user')->user();
+
+        try {
+            // Start the transaction
+            DB::beginTransaction();
+
+            $fund = new Fund();
+            $fund->user_id = $user->id;
+            $fund->email = $request->email;
+            $fund->amount = $request->amount;
+
+            if ($request->hasFile('image')) {
+                // If the user already has an image, delete the old one
+                $image = $image = $request->file('image');
+
+                $fund->image = ImageManager::upload('fund',$image->getClientOriginalExtension(),$image);
+            }
+
+            $fund->save();
+
+            // Commit the transaction if everything is successful
+            DB::commit();
+
+            return response()->json([
+                'message' => 'Add case successfully',
+                'status' => 'success',
+                'statusCode' => '200',
+            ], 200);
+        } catch (\Exception $e) {
+            // Rollback the transaction if an error occurs
+            DB::rollBack();
+
+            return response()->json([
+                'message' => 'An error occurred',
+                'status' => 'failure',
+                'statusCode' => '500',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
+
+
+   
 
 }
