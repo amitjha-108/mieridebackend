@@ -36,7 +36,6 @@ Route::post('get-ride-price', [PriceApiController::class, 'getRidePrice']);
 
 
 
-
 Route::middleware(['check.guard:driver'])->group(function () {
     Route::post('complete-driver-profile', [DriverApiController::class, 'completeDriverProfile']);
     Route::post('edit-driver-profile', [DriverApiController::class, 'editDriver']);
@@ -47,15 +46,22 @@ Route::middleware(['check.guard:admin'])->group(function () {
     Route::post('create-admin', [AdminApiController::class, 'createAdmin']);
     Route::get('list-admins', [AdminApiController::class, 'listAdmins']);
 
-    Route::post('store-personal-ride-price', [PriceApiController::class, 'storePersonalRidePrice']);
-    Route::post('store-sharing-ride-price', [PriceApiController::class, 'storeSharingRidePrice']);
-    Route::post('store-test-drive-ride-price', [PriceApiController::class, 'storeTestdriveRidePrice']);
-
     Route::post('store-ride-category', [RideCategoryApiController::class, 'storeRideCategory']);
     Route::post('edit-ride-category/{id}', [RideCategoryApiController::class, 'editRideCategory']);
     Route::delete('delete-ride-category/{id}', [RideCategoryApiController::class, 'deleteRideCategory']);
     Route::post('update-ride-category-status/{id}', [RideCategoryApiController::class, 'updateRideCategoryStatus']);
 
+    Route::post('store-personal-ride-price', [PriceApiController::class, 'storePersonalRidePrice']);
+    Route::post('edit-personal-ride-price', [PriceApiController::class, 'editPersonalRidePrice']);
+
+    Route::post('store-sharing-ride-price', [PriceApiController::class, 'storeSharingRidePrice']);
+    Route::post('edit-sharing-ride-price', [PriceApiController::class, 'editSharingRidePrice']);
+
+    Route::post('store-test-drive-ride-price', [PriceApiController::class, 'storeTestdriveRidePrice']);
+    Route::post('edit-test-drive-ride-price', [PriceApiController::class, 'editTestdriveRidePrice']);
+
+    Route::post('get-ride-price-list', [PriceApiController::class, 'getRidePriceList']);
+    Route::delete('delete-ride-price/{id}', [PriceApiController::class, 'deleteRidePriceById']);
 });
 
 Route::middleware(['check.guard:subroleuser'])->group(function () {
