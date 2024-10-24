@@ -56,7 +56,7 @@ class AdminApiController extends Controller
             'email' => $request->email,
             'country_code' => $request->country_code,
             'contact_no' => $request->contact_no,
-            'password' => $request->password,
+            'password' => bcrypt($request->password),
             'image' => $request->image,
             'wallet_money' => 0,
             'status' => 'active',
@@ -64,7 +64,7 @@ class AdminApiController extends Controller
             'parent_id' => null,
             'create_child' => 1,
             'is_superadmin' => $request->is_superadmin,
-            ]);
+        ]);
 
         // Grant all permissions to superadmin
         if ($administrator->is_superadmin) {
@@ -307,122 +307,6 @@ class AdminApiController extends Controller
         ], 201);
     }
 
-    // public function loginAdministrator(Request $request)
-    // {
-    //     $validator = Validator::make($request->all(), [
-    //         'email' => 'required|string|email|max:150',
-    //         'password' => 'required|string|min:6',
-    //     ]);
-
-    //     if ($validator->fails()) {
-    //         return response()->json([
-    //             'message' => 'Validation failed',
-    //             'status' => 'failure',
-    //             'statusCode' => '400',
-    //             'data' => $validator->errors(),
-    //         ], 400);
-    //     }
-
-    //     $administrator = Admin::where('email', $request->email)->first();
-
-    //     if (!$administrator) {
-    //         return response()->json([
-    //             'message' => 'Email not registered',
-    //             'status' => 'failure',
-    //             'statusCode' => '400',
-    //         ], 400);
-    //     }
-
-    //     if ($request->password != $administrator->password) {
-    //         return response()->json([
-    //             'message' => 'Incorrect password',
-    //             'status' => 'failure',
-    //             'statusCode' => '400',
-    //         ], 200);
-    //     }
-
-    //     $permissions = [];
-    //     $permissions = Permission::where('admin_id', $administrator->id)->orWhere('role_id',$administrator->role_id)
-    //                     ->get()->makeHidden(['admin_id','created_at','updated_at']);
-
-    //     $grantedPermissions = $permissions->map(function ($permission) {
-    //         return collect($permission)->filter(function ($value, $key) {
-    //             return $value != 0 && !in_array($key, ['id', 'role_id']);
-    //         });
-    //     });
-
-    //     $tokenResult = $administrator->createToken('auth_token');
-    //     $tokenResult->token->guard_name = 'admin';
-    //     $tokenResult->token->save();
-
-    //     return response()->json([
-    //         'message' => 'Login successfully',
-    //         'status' => 'success',
-    //         'statusCode' => '200',
-    //         'userType' => $administrator->role_id,
-    //         'createChild' => $administrator->create_child,
-    //         'token' => $tokenResult->accessToken,
-    //         'tokenGuard' => $tokenResult->token->guard_name,
-    //         'data' => $administrator,
-    //         'permissions' => $grantedPermissions,
-    //     ], 200);
-    // }
-
-    // public function loginSubroleUser(Request $request)
-    // {
-    //     $validator = Validator::make($request->all(), [
-    //         'email' => 'required|string|email|max:150',
-    //         'password' => 'required|string|min:6',
-    //     ]);
-
-    //     if ($validator->fails()) {
-    //         return response()->json([
-    //             'message' => 'Validation failed',
-    //             'status' => 'failure',
-    //             'statusCode' => '400',
-    //             'data' => $validator->errors(),
-    //         ], 400);
-    //     }
-
-    //     $subroleuser = SubroleUser::where('email', $request->email)->first();
-
-    //     if (!$subroleuser) {
-    //         return response()->json([
-    //             'message' => 'Email not registered',
-    //             'status' => 'failure',
-    //             'statusCode' => '400',
-    //         ], 400);
-    //     }
-
-    //     if ($request->password != $subroleuser->password) {
-    //         return response()->json([
-    //             'message' => 'Incorrect password',
-    //             'status' => 'failure',
-    //             'statusCode' => '400',
-    //         ], 200);
-    //     }
-
-    //     $permissions = [];
-    //     $permissions = Permission::where('role_id', $subroleuser->role_id)->get();
-
-    //      // Add guard_name to token
-    //     $tokenResult = $subroleuser->createToken('auth_token');
-    //     $tokenResult->token->guard_name = 'subroleuser';
-    //     $tokenResult->token->save();
-
-    //     return response()->json([
-    //         'message' => 'Subrole User Login successfully',
-    //         'status' => 'success',
-    //         'statusCode' => '200',
-    //         'userType' => $subroleuser->role_id,
-    //         'createChild' => $subroleuser->create_child,
-    //         'token' => $tokenResult->accessToken,
-    //         'tokenGuard' => $tokenResult->token->guard_name,
-    //         'data' => $subroleuser,
-    //         'permissions' => $permissions,
-    //     ], 200);
-    // }
-
     public function login(Request $request)
     {
         $validator = Validator::make($request->all(), [
@@ -461,7 +345,7 @@ class AdminApiController extends Controller
         }
 
         // Check password
-        if ($request->password != $user->password) {
+        if (!Hash::check($request->password, $user->password)) {
             return response()->json([
                 'message' => 'Incorrect password',
                 'status' => 'failure',
@@ -538,7 +422,7 @@ class AdminApiController extends Controller
             'email' => $request->email,
             'country_code' => $request->country_code,
             'contact_no' => $request->contact_no,
-            'password' => $request->password,
+            'password' => bcrypt($request->password),
             'image' => $request->image,
             'wallet_money' => 0,
             'status' => 'active',
